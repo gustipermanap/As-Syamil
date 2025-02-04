@@ -1,0 +1,14 @@
+
+{% block hero %}
+  <h2><span>{{ hero.welcome_text }}</span><span class="accent">{{ hero.welcome_title }}</span></h2>
+  <p>{{ hero.description }}</p>
+  <div class="d-flex">
+  
+  {% if hero.video_url %}
+    <a href="{{ hero.primary_button_link }}" class="btn-get-started">{{ hero.primary_button_text }}</a>
+    <a href="{{ hero.video_url }}" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>{{ hero.video_button_text }}</span></a>
+    
+  {% endif %}
+    </div>
+{% endblock hero %}
+  

@@ -1,0 +1,33 @@
+{% load static %}
+
+    <!-- Call To Action Section -->
+    <section id="call-to-action" class="call-to-action section dark-background">
+
+      {% for cta in cta %}
+        <div class="container">
+          
+            <img src="{{ cta.image_background.url }}" alt="">
+        {% endfor %}
+          
+          <div class="content row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
+            <div class="col-xl-10">
+              <div class="text-center">
+                
+                {% for fcta in cta %}
+                  
+                  {% if cta %}
+                    <a href="{{fcta.link}}" class="glightbox play-btn"></a>   
+                  {% else %}
+                  <a href="{{cta.video_upload}}" class="glightbox play-btn"></a>
+                  {% endif %}
+                  <h3>{{fcta.title}}</h3>
+                  <p>{{cta.description}}</p>
+                  <a class="cta-btn" href="#">Call To Action</a>
+                {% endfor %}
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </section><!-- /Call To Action Section -->

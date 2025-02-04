@@ -1,0 +1,52 @@
+{% load static %}
+<!-- Services Section -->
+<section id="services" class="services section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      
+      {% for hservice in service %}
+        <h2>{{hservice.service_title}}</h2>            
+        {% if hservice.service_description %}
+        <p>{{hservice.service_description}}</p>
+        {% else %}
+        <p></p>
+        {% endif %}
+          
+      
+      {% endfor %}
+        </div><!-- End Section Title -->
+
+    <div class="container">
+
+      <div class="row gy-4">
+
+        {% for serviceitem in service_item %}
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="service-item  position-relative">
+            
+              <div class="d-flex justify-content-center align-items-center">
+                
+                {% if serviceitem.image_service %}
+                  <a href="{{serviceitem.image_service.url}}" class="glightbox">
+                    <img src="{{serviceitem.image_service.url}}" class="img-fluid" alt="">
+                  </a>
+                {% else %}
+                <img src="{% static '404.png' %}" class="img-fluid" alt="Default Image">
+                {% endif %}
+                  
+              </div>
+              <h3>{{serviceitem.service_Item_title}}</h3>
+              <p>{{serviceitem.service_Item_description}}</p>
+              <a href="{{serviceitem.link_Item_service}}" class="readmore stretched-link">Read more <i class="bi bi-arrow-right"></i></a>
+            
+              </div>
+        </div><!-- End Service Item -->
+        {% endfor %}
+        
+
+      </div>
+
+    </div>
+
+  </section><!-- /Services Section -->

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+<!-- PPDB Section -->
+
+{% block content %}
+<br><br><br>
+  <section id="ppdb" class="ppdb section">
+  
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Penerimaan Peserta Didik Baru (PPDB)</h2>
+        <p>Selamat datang di halaman PPDB Pesantren As-Syamil. Berikut adalah informasi dan syarat pendaftaran.</p>
+        <h3>Buka Pendaftaran</h3>
+                    <p>1 Mei 2023 - 30 Juni 2023</p>
+    </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <form action="" method="post" class="php-email-form" data-aos="fade" data-aos-delay="100">
+                  {% csrf_token %}
+                  <div class="row gy-4">
+
+                      <!-- Data Calon Peserta Didik Baru -->
+                      <div class="col-md-6">
+                          <label for="nama_lengkap">Nama Lengkap</label>
+                          {{ form.nama_lengkap }}<br>
+                          <label for="jenis_kelamin">Jenis Kelamin</label>
+                          {{ form.jenis_kelamin }}
+                      </div>
+  
+  
+                      <div class="col-md-6">
+                        <label for="nik">NIK</label>
+                        {{ form.nik }}<br>
+                          <label for="nisn">NISN</label>
+                          {{ form.nisn }}
+                      </div>
+  
+  
+                      <div class="col-md-6">
+                          <label for="tempat_lahir">Tempat Lahir</label>
+                          <div>{{ form.tempat_lahir }}</div>
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="tanggal_lahir">Tanggal Lahir</label>
+                          {{ form.tanggal_lahir }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="agama">Agama</label>
+                          {{ form.agama }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="no_handphone">No. Handphone</label>
+                          {{ form.no_handphone }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="anak_ke">Anak Ke</label>
+                          {{ form.anak_ke }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="jumlah_saudara">Jumlah Saudara</label>
+                          {{ form.jumlah_saudara }}
+                      </div>
+  
+                      <!-- Data Pendidikan Sebelumnya -->
+                      <div class="col-md-6">
+                          <label for="asal_sekolah">Asal Sekolah</label>
+                          {{ form.asal_sekolah }}
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <label for="tgl_no_ijazah">Tanggal No. Ijazah</label>
+                        {{ form.tgl_no_ijazah }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="lama_belajar">Lama Belajar</label>
+                        {{ form.lama_belajar }}
+                    </div>
+                      <div class="col-md-6">
+                          <label for="diterima_di_sekolah">Diterima di Sekolah</label>
+                          {{ form.diterima_di_sekolah }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="pindahan_dari_sekolah">Pindahan Dari Sekolah</label>
+                          {{ form.pindahan_dari_sekolah }}
+                      </div>
+  
+                      <div class="col-md-12">
+                          <label for="alasan_pindah">Alasan Pindah</label>
+                          {{ form.alasan_pindah }}
+                      </div>
+  
+                      <!-- Alamat Lengkap -->
+                      <div class="col-md-12">
+                          <label for="alamat">Alamat Lengkap</label>
+                          {{ form.alamat }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="rt">RT</label>
+                          {{ form.rt }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="rw">RW</label>
+                          {{ form.rw }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="kelurahan">Kelurahan</label>
+                          {{ form.kelurahan }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="kecamatan">Kecamatan</label>
+                          {{ form.kecamatan }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="kota_kabupaten">Kota / Kabupaten</label>
+                          {{ form.kota_kabupaten }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="kode_pos">Kode Pos</label>
+                          {{ form.kode_pos }}
+                      </div>
+  
+                      <!-- Data Orang Tua -->
+                      <div class="col-md-6">
+                          <label for="nama_ayah">Nama Ayah</label>
+                          {{ form.nama_ayah }}<br>
+                          <label for="pekerjaan_ayah">Pekerjaan Ayah</label>
+                          {{ form.pekerjaan_ayah }}<br>                          
+                          <label for="pendidikan_ayah">Pendidikan Ayah</label>
+                          {{ form.pendidikan_ayah }}<br>
+                          <label for="ktp_ayah">KTP Ayah</label>
+                          {{ form.ktp_ayah }}
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="nama_ibu">Nama Ibu</label>
+                          {{ form.nama_ibu }}<br>
+                          <label for="pekerjaan_ibu">Pekerjaan Ibu</label>
+                          {{ form.pekerjaan_ibu }}<br>
+                          <label for="pendidikan_ibu">Pendidikan Ibu</label>
+                          {{ form.pendidikan_ibu }}<br>
+                          <label for="ktp_ibu">KTP Ibu</label>
+                          {{ form.ktp_ibu }}                          
+                      </div>
+  
+                      <div class="col-md-6">
+                          <label for="penghasilan_bulanan">Penghasilan Bulanan</label>
+                          {{ form.penghasilan_bulanan }}
+                      </div>
+  
+  
+  
+                      <div class="col-md-12">
+                          <label for="alamat_orangtua">Alamat Orang Tua</label>
+                          {{ form.alamat_orangtua }}
+                      </div>
+  
+                      <!-- Foto -->
+                      <div class="col-md-12">
+                          <label for="foto">Pas Foto</label>
+                          {{ form.foto }}
+                      </div>
+  
+                      <!-- Submit Button -->
+                      <div class="col-md-12 text-center">
+                          <div class="loading">Loading...</div>
+                          <div class="error-message"></div>
+                          <div class="sent-message">Formulir pendaftaran telah dikirim. Terima kasih!</div>
+  
+                          <button type="submit" class="btn btn-primary">Kirim Pendaftaran</button>
+                      </div>
+  
+                  </div>
+              </form>
+            </div><!-- End PPDB Form Column -->
+          </div>
+      </div>
+  </section><!-- /PPDB Section -->
+{% endblock content %}

@@ -1,0 +1,59 @@
+{% load static %}
+{% comment %} {% extends 'base.html' %} {% endcomment %}
+
+    <!-- Hero Section -->
+    
+    
+    <section id="hero" class="hero section accent-background">
+      {% for heros in heroes %}
+      <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-5 justify-content-between">
+            <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+              <h2><span>{{heros.welcome_text}}</span><span class="accent"> {{heros.title}}</span></h2>
+              <p>{{heros.description}}</p>
+              <div class="d-flex">
+                <a href="#about" class="btn-get-started">{{heros.button_name}}</a>
+                <a href="{{heros.primary_button_link}}" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>{{heros.title}}</span></a>
+                
+              </div>
+            </div>
+          
+            
+          <div class="col-lg-5 order-1 order-lg-2">
+            <img src="{{heros.image_landing_page}}" class="img-fluid" alt="">
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <div class="icon-boxes position-relative" data-aos="fade-up" data-aos-delay="200">
+        <div class="container position-relative">
+          <div class="row gy-4 mt-5"> 
+            {% for boxs in hbox %}
+              <div class="col-xl-3 col-md-6">
+                
+                <div class="icon-box">
+                  
+                  <div class="icon">
+                    {% if boxs.icon %}
+                      <i class="bi bi-{{boxs.icon}}"></i>
+                    {% else %}
+                      <i class="bi bi-question-circle"></i>
+                    {% endif %}
+                  </div>
+                  <h4 class="title"><a href="{{boxs.link}}" class="stretched-link">{{boxs.title}}</a></h4>
+                  
+                </div>
+                
+              </div>
+              {% endfor %}
+              <!--End Icon Box -->
+
+  
+          </div>
+        </div>
+      </div>
+  
+    </section><!-- /Hero Section -->
+    
+ 
+    

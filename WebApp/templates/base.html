@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <!-- href="{% static 'css/styles.css' %} -->
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>As-syamil</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <link rel="icon" href="{% static 'assets/img/favicon.png' %}" type="image/png">
+  <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/png">
+  <!-- Favicons 
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+   -->
+  <!-- <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" type="image/png"> -->
+  <!-- <link href="{% static 'assets/img/favicon.png' %}" rel="icon" type="image/png"> -->
+  <!-- <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon" sizes="180x180"> -->
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header fixed-top">
+
+    <div class="topbar d-flex align-items-center">
+      <div class="container d-flex justify-content-center justify-content-md-between">
+        <div class="contact-info d-flex align-items-center">
+          
+          {% for data in datas %}
+            <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:{{data.email}}">{{data.email}}</a></i>
+            <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{data.contact}}</span></i>
+          {% endfor %}
+            
+        </div>
+        <div class="social-links d-none d-md-flex align-items-center">
+          
+         
+          {% for media in sosmed %}
+            <a href="{{ media.url }}" class="{{ media.title }}"><i class="bi bi-{{media.icon}}"></i></a>  
+          {% endfor %}
+          <a href="{% url 'admin' %}" class="btn btn-primary">Login</a>
+          
+        </div>
+      </div>
+    </div><!-- End Top Bar -->
+
+    <div class="branding d-flex align-items-cente">
+
+      <div class="container position-relative d-flex align-items-center justify-content-between">
+        <a href="{% url 'base' %}" class="logo d-flex align-items-center">
+          <!-- Uncomment the line below if you also wish to use an image logo -->
+          <!-- <img src="assets/img/logo.png" alt=""> -->
+           <h1 class="sitename">As-Syamil</h1>
+          <img src="{% static 'assets/img/logo.png' %}" alt="Logo As-Syamil">
+          <span>.</span>
+        </a>
+
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{%url 'base'%}#hero" class="active">Home<br></a></li>
+            <li><a href="{%url 'base'%}#about">About</a></li>
+            <li><a href="{%url 'base'%}#services">Services</a></li>
+            <li><a href="{%url 'base'%}#portfolio">Portfolio</a></li>
+            <li><a href="{%url 'base'%}#team">Team</a></li>
+            <li><a href="{% url 'post_list' %}">Blog</a></li>
+            <li><a href="{% url 'pendaftaran' %}">PPDB</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li> 
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+      </div>
+
+    </div>
+
+  </header>
+  {% block blog %}
+  <main class="main">
+
+{% block content %}
+
+{% block hero %}
+  
+{% endblock hero %}
+
+
+
+  
+
+  {% include 'pages/hero.html' %}
+  {% include 'pages/about.html' %}
+  {% include 'pages/client.html' %}
+  {% include 'pages/cta.html' %}
+  {% include 'pages/service.html' %}
+  {% include 'pages/testimonial.html' %}
+  {% include 'pages/portfolio.html' %}
+  {% include 'pages/team.html' %}
+  {% include 'pages/recentpost.html' %}
+
+  
+
+  
+
+    
+    
+      {% comment %} {% include 'pages/home.html' %} {% endcomment %}
+
+{% endblock content %}
+<div class="whatsapp-float">
+  <a href="https://wa.me/+6282128333839" target="_blank">
+      <i class="bi bi-whatsapp"></i>
+  </a>
+</div>
+<style>
+  .whatsapp-float {
+      position: fixed;
+      bottom: 80px; /* Jarak dari bawah diubah menjadi 40px */
+      right: 20px; /* Jarak dari kanan */
+      background-color: #25D366; /* Warna latar belakang WhatsApp */
+      border-radius: 20%; /* Membuatnya bulat */
+      padding: 30px; /* Ruang di dalam */
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Bayangan */
+  }
+  .whatsapp-float a {
+      color: white; /* Warna ikon */
+      font-size: 50px; /* Ukuran ikon */
+  }
+  html, body {
+      height: 100%; /* Memastikan html dan body memiliki tinggi 100% */
+      margin: 0; /* Menghapus margin default */
+  }
+  body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Memastikan body memiliki tinggi minimal 100% dari viewport */
+  }
+  .main {
+      flex: 1; /* Membuat bagian utama mengisi ruang yang tersisa */
+  }
+</style>
+  </main>
+  {% endblock blog %}
+  <footer id="footer" class="footer accent-background">
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-5 col-md-12 footer-about">
+          <a href="{% url 'base' %}" class="logo d-flex align-items-center">
+            
+            {% for footertitle in datas %}
+              <span class="sitename">{{footertitle.nama_sekolah}}</span>
+            {% endfor %}
+              
+          </a>
+          {% for titledesk in heroes %}
+            
+            <p>{{titledesk.title}}</p>
+          {% endfor %}
+            
+          <div class="social-links d-flex mt-4">
+          {% for mediafooter in sosmed %}
+          <a href="{{ mediafooter.url }}"><i class="bi bi-{{mediafooter.icon}}"></i></a>  
+          {% endfor %}
+            
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="#"></a></li>
+            <!-- <li><a href="#">Web Development</a></li>
+            <li><a href="#">Product Management</a></li>
+            <li><a href="#">Marketing</a></li>
+            <li><a href="#">Graphic Design</a></li> -->
+          </ul>
+        </div>
+
+          <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+            <h4>Contact Us</h4>
+        {% for datafooter in datas %}
+              <p>{{datafooter.alamat}}</p>
+              <p class="mt-4"><strong>Phone:</strong> <span>{{datafooter.contact}}</span></p>
+            <p><strong>Email:</strong> <span>{{datafooter.email}}</span></p>
+        {% empty %}
+            <p>Kp. Parasi, Kaungcaang</p> <p>Kec. Cadasari, Kabupaten Pandeglang</p> <p>Banten 42251</p>
+            <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+            <p><strong>Email:</strong> <span>ponpesassyamil@gmail.com</span></p>
+        {% endfor %}
+          </div>
+        
+  
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">As-Syamil</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+   
+        Designed by <a href="https://www.youtube.com/watch?v=MA7EbeGuis0">DreamsTech</a> Distributed by <a href="https://www.youtube.com/watch?v=MA7EbeGuis0">Gusti</a>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+
+</body>
+
+</html>

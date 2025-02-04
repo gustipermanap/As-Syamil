@@ -1,0 +1,43 @@
+{% load static %}
+<!-- Team Section -->
+
+  
+  <section id="team" class="team section">
+    {% for teammate in team %}
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>{{teammate.title_team}}</h2>
+        <p>{{teammate.description_team}}</p>
+      </div><!-- End Section Title -->
+    {% endfor %}
+  
+      
+      
+        <div class="container">
+    
+          <div class="row gy-4">
+            {% for tmember in team_Member %}
+            <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="100">
+              <div class="member">
+                {% if tmember.team_image %}
+                    <img src="{{ tmember.team_image.url }}" class="img-fluid" alt="">
+                {% else %}
+                    <img src="{% static '404.png' %}" class="img-fluid" alt="Default Image">
+                {% endif %}
+                <h4>{{tmember.team_Item_title}}</h4>
+                <span>{{tmember.team_Item_description}}</span>
+                <div class="social">
+                  <a href="{{ tmember.person_twitter_url }}"><i class="bi bi-twitter-x"></i></a>
+                  <a href="{{ tmember.person_facebook_url }}"><i class="bi bi-facebook"></i></a>
+                  <a href="{{ tmember.person_instagram_url }}"><i class="bi bi-instagram"></i></a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+    
+        </div>
+      
+        
+  
+    </section><!-- /Team Section -->

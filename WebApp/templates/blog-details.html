@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block blog %}
+      <br>
+      <br><br><br><br>
+
+  
+      <div class="container">
+        <div class="row">
+  
+          <div class="col-lg-12">
+  
+            <!-- Blog Details Section -->
+            <section id="blog-details" class="blog-details section">
+              <div class="container">
+  
+                <article class="article">
+  
+                  <div class="post-img">
+                    {% if post.image %}
+                      <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid">
+                    {% else %}
+                      <!-- Jika tidak ada gambar, tidak ada tindakan yang diperlukan -->
+                    {% endif %}
+                  </div>
+  
+                  <h2 class="title">{{ post.title }}</h2>
+  
+                  <div class="meta-top">
+                    <ul>
+                      <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="#">{{ post.author }}</a></li>
+                      <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href="#"><time datetime="{{ post.created_at }}">{{ post.created_at|date:"F j, Y H:i" }}</time></a></li>
+                    </ul>
+                  </div><!-- End meta top -->
+  
+                  <div class="content">
+                    {% if post.content %}
+                      <p>{{ post.content }}</p>
+                    {% else %}
+                      <p>Tidak ada konten untuk ditampilkan.</p>
+                    {% endif %}
+                  </div><!-- End post content -->
+  
+                </article>
+  
+              </div>
+            </section><!-- /Blog Details Section -->
+  
+            <!-- End recent post item-->
+  
+          </div><!--/Recent Posts Widget -->
+  
+        </div>
+  
+      </div>
+      <br>
+      <br><br><br><br>
+      <br>
+      <br><br>
+    {% endblock blog %}
+      

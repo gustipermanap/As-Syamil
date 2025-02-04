@@ -1,0 +1,71 @@
+{% load static %}
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials section">
+
+    
+    {% for testi in testimonial %}
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>{{testi.testimonial_title}}</h2>
+        <p>{{testi.testimonial_description}}</p>
+      </div><!-- End Section Title -->
+    {% endfor %}
+      
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="swiper init-swiper">
+        <script type="application/json" class="swiper-config">
+          {
+            "loop": true,
+            "speed": 600,
+            "autoplay": {
+              "delay": 5000
+            },
+            "slidesPerView": "auto",
+            "pagination": {
+              "el": ".swiper-pagination",
+              "type": "bullets",
+              "clickable": true
+            },
+            "breakpoints": {
+              "320": {
+                "slidesPerView": 1,
+                "spaceBetween": 40
+              },
+              "1200": {
+                "slidesPerView": 3,
+                "spaceBetween": 10
+              }
+            }
+          }
+        </script>
+        <div class="swiper-wrapper">
+
+          
+          {% for testiitem in testimonial_Item %}
+            <div class="swiper-slide">
+              <div class="testimonial-item">
+                <img src="{{testiitem.testimonial_image}}" class="testimonial-img" alt="">
+                <h3>{{testiitem.testimonial_Item_title}}</h3>
+                <h4>{{testiitem.testimonial_Personal_departement}}</h4>
+                <div class="stars">
+                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </div>
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  <span>{{testiitem.testimonial_Personal_description}}</span>
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+              </div>
+            </div><!-- End testimonial item -->
+          {% endfor %}
+            
+
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+    </div>
+
+  </section><!-- /Testimonials Section -->

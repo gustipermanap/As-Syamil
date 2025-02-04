@@ -1,0 +1,166 @@
+{% load static %}
+<!-- Portfolio Section -->
+<section id="portfolio" class="portfolio section">
+
+    <!-- Section Title -->
+    
+    {% for pportfolio in port %}
+      <div class="container section-title" data-aos="fade-up">
+        <h2>{{pportfolio.portfolio_title}}</h2>
+        <p>{{pportfolio.portfolio_description}}</p>
+      </div><!-- End Section Title -->
+    {% endfor %}
+      
+
+    <div class="container">
+
+      <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
+
+        <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
+          {% for tagport in Porttag %}
+            <li data-filter="*" class="filter-active">All</li>
+            <li data-filter=".filter-{{tagport.portfolio_tag}}">{{tagport.portfolio_tag}}</li>
+          {% endfor %}
+            
+        </ul><!-- End Portfolio Filters -->
+
+        <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+
+         
+         {% for iport in port_item %}
+           <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+             <div class="portfolio-content h-100">
+               {% if iport.portfolio_image %}
+                 <a href="{{ iport.portfolio_image.url }}" data-gallery="portfolio-gallery-app" class="glightbox">
+                   <img src="{{ iport.portfolio_image.url }}" class="img-fluid" alt="">
+                 </a>
+               {% else %}
+                
+                {% endif %}
+               <div class="portfolio-info">
+                 <h4><a href="portfolio-details.html" title="More Details">{{iport.portfolio_Item_title}}</a></h4>
+                 <p>{{iport.portfolio_Item_description}}</p>
+               </div>
+             </div>
+           </div>
+         {% endfor %}
+          
+          <!-- End Portfolio Item 
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/product-1.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/product-1.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Product 1</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/branding-1.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/branding-1.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Branding 1</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/books-1.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/books-1.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Books 1</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/app-2.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/app-2.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">App 2</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/product-2.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/product-2.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Product 2</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/branding-2.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/branding-2.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Branding 2</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/books-2.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/books-2.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Books 2</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/app-3.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/app-3.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">App 3</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/product-3.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/product-3.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Product 3</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/branding-3.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/branding-3.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Branding 3</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-books">
+            <div class="portfolio-content h-100">
+              <a href="{% static 'assets/img/portfolio/books-3.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox"><img src="{% static 'assets/img/portfolio/books-3.jpg' %}" class="img-fluid" alt=""></a>
+              <div class="portfolio-info">
+                <h4><a href="portfolio-details.html" title="More Details">Books 3</a></h4>
+                <p>Lorem ipsum, dolor sit amet consectetur</p>
+              </div>
+            </div>
+          </div> /Portfolio Section -->
+
+        </div><!-- End Portfolio Container -->
+
+      </div>
+
+    </div>
+
+  </section><!-- /Portfolio Section -->

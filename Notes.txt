@@ -1,0 +1,4 @@
+1. UI/UX sudah sesuai
+2. Import Image
+3. masukan asset ke static
+4. Arahkan navbar
