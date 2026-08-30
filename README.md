@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+# Pondok Pesantren As-Syamil
+
+Saat ini repositori ini berisi website publik dan CMS.
+
+Arah berikutnya: **Sistem Akademik Pesantren**. Seluruh keputusan, modul, backlog 4 minggu, dan aturan agent ada di [docs/README.md](docs/README.md).
+=======
 # Website CMS Pondok Pesantren As-Syamil
 
 Website publik dan panel CMS (Django Admin) untuk Pondok Pesantren As-Syamil, Pandeglang.
@@ -41,3 +48,4 @@ Jangan mengunggah `db.sqlite3`, folder `env/`, atau `.env` ke git.
 ## Lisensi
 
 MIT © Gusti Permana Putra
+>>>>>>> origin/main

@@ -1,0 +1,10 @@
+---
+description: Aturan pengerjaan Sistem Akademik Pesantren oleh cloud agent
+alwaysApply: true
+---
+
+Kerjakan satu issue SIA per PR. Ikuti `AGENTS.md` dan `docs/09-runbook-otomasi.md`.
+
+Pakai istilah pesantren di UI. Jangan menambah modul di luar `docs/06-kontrak-modul.md`.
+
+Jika issue bergantung pada SIA lain yang belum di `main`, berhenti dan tulis blocker.
