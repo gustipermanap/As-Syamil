@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} — {{ sekolah.nama_sekolah|default:"As-Syamil" }}{% endblock %}
+
+{% block content %}
+<br><br><br>
+<section class="section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>{{ page_title }}</h2>
+    <p>{{ page_text }}</p>
+    <p class="mt-4">
+      <a class="btn btn-primary" href="{% url back_url_name %}">{{ back_label }}</a>
+    </p>
+  </div>
+</section>
+{% endblock content %}

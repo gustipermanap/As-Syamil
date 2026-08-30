@@ -1,98 +1,135 @@
 from django.contrib import admin
+from django.db import models
+from tinymce.widgets import TinyMCE
 
-from .models import Pendaftaran, Post, SosialMedia, DataSekolah, Hero, HeroBox, About, sponsor, CalltoAction, Service, Service_Item, testimonial, testimonial_Item, Portfolio, Portfolio_tag, Portfolio_Item, Team, Team_Member, message_guest
- 
- 
-admin.site.site_header = "As-Syamil"  # Ganti dengan nama yang diinginkan
-admin.site.site_title = "As-Syamil"   # Ganti dengan judul yang diinginkan
-admin.site.index_title = "Selamat Datang di Admin As-Syamil"  # Ganti dengan judul yang diinginkan
+from .models import (
+    About,
+    CalltoAction,
+    DataSekolah,
+    Hero,
+    HeroBox,
+    Pendaftaran,
+    Portfolio,
+    Portfolio_Item,
+    Portfolio_tag,
+    Post,
+    Service,
+    Service_Item,
+    SosialMedia,
+    Team,
+    Team_Member,
+    message,
+    message_guest,
+    sponsor,
+    testimonial,
+    testimonial_Item,
+)
 
- 
+
 @admin.register(SosialMedia)
 class SosialMediaAdmin(admin.ModelAdmin):
     list_display = ('title', 'icon', 'url')
-    
+
+
 @admin.register(DataSekolah)
 class DataSekolahAdmin(admin.ModelAdmin):
-    list_display = ('nama_sekolah', 'alamat', 'email', 'contact')
-     
+    list_display = ('nama_sekolah', 'email', 'contact', 'whatsapp', 'ppdb_periode')
+
+
 @admin.register(Hero)
 class HeroAdmin(admin.ModelAdmin):
     list_display = ('title', 'welcome_text')
+
 
 @admin.register(HeroBox)
 class HeroBoxAdmin(admin.ModelAdmin):
     list_display = ('title', 'link', 'icon')
 
+
 @admin.register(About)
 class AboutAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'image')
+    list_display = ('title', 'description')
+
 
 @admin.register(sponsor)
-class sponsorAdmin(admin.ModelAdmin):
-    list_display = ('image',)
+class SponsorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'image')
+
 
 @admin.register(CalltoAction)
 class CalltoActionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'link')
-    
+    list_display = ('title', 'description', 'text_button')
+
+
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('service_title', 'service_description')
-    
+
+
+@admin.register(Service_Item)
+class ServiceItemAdmin(admin.ModelAdmin):
+    list_display = ('service_Item_title', 'service_Item_description')
+
+
 @admin.register(Portfolio)
 class PortfolioAdmin(admin.ModelAdmin):
-    list_display = ('portfolio_title', 'portfolio_description')  # Tambahkan fields yang diinginkan
+    list_display = ('portfolio_title', 'portfolio_description')
+
+
+@admin.register(Portfolio_tag)
+class PortfolioTagAdmin(admin.ModelAdmin):
+    list_display = ('portfolio_tag',)
+
+
+@admin.register(Portfolio_Item)
+class PortfolioItemAdmin(admin.ModelAdmin):
+    list_display = ('portfolio_Item_title', 'portfolio_tag')
+
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('title_team','description_team')  # Tambahkan fields yang diinginkan
-    
-# class PPDBAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'email', 'contact_number', 'parent_name', 'registration_date', 'date_of_birth')  # Fields to display in list view
-#     search_fields = ('name', 'email', 'contact_number', 'parent_name')  # Fields to search by in the admin interface
-#     list_filter = ('registration_date', 'date_of_birth')  # Filters for the admin interface
-#     ordering = ('-registration_date',)  # Default ordering in the admin
+    list_display = ('title_team', 'description_team')
 
 
+@admin.register(Team_Member)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ('team_Item_title', 'title')
 
+
+@admin.register(testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ('testimonial_title', 'testimonial_description')
+
+
+@admin.register(testimonial_Item)
+class TestimonialItemAdmin(admin.ModelAdmin):
+    list_display = ('testimonial_Personal_title', 'testimonial_Personal_departement')
+
+
+@admin.register(message_guest)
+class MessageGuestAdmin(admin.ModelAdmin):
+    list_display = ('title_message', 'description_for_message')
+
+
+@admin.register(message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'name', 'email', 'created_at')
+    search_fields = ('name', 'email', 'subject')
+    readonly_fields = ('created_at',)
+
+
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    # Menampilkan fields yang diinginkan di admin panel
-    list_display = ('title', 'slug', 'created_at', 'updated_at')
-    prepopulated_fields = {'slug': ('title',)}  # Mengisi slug otomatis berdasarkan title
+    list_display = ('title', 'slug', 'author', 'created_at')
+    prepopulated_fields = {'slug': ('title',)}
+    formfield_overrides = {
+        models.TextField: {'widget': TinyMCE(attrs={'cols': 80, 'rows': 20})},
+    }
 
+
+@admin.register(Pendaftaran)
 class PendaftaranAdmin(admin.ModelAdmin):
-    list_display = ('nama_lengkap', 'nik', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'agama')
+    list_display = ('nama_lengkap', 'nik', 'nisn', 'no_handphone', 'created_at')
     search_fields = ('nama_lengkap', 'nik', 'nisn')
-    list_filter = ('jenis_kelamin', 'agama')
-    
-# admin.site.register(Hero)
-# admin.site.register(HeroBox)
-# admin.site.register(Post, PostAdmin)
-# admin.site.register(Pendaftaran, PendaftaranAdmin)
-# # admin.site.register(PPDB, PPDBAdmin)
-# admin.site.register(Service_Item)
-# admin.site.register(testimonial)
-# admin.site.register(testimonial_Item)
-# admin.site.register(Portfolio)
-# admin.site.register(Portfolio_tag)
-# admin.site.register(Portfolio_Item)
-# admin.site.register(Team)
-# admin.site.register(Team_Member)
-# # admin.site.register(blog)
-# # admin.site.register(blog_detail)
-# admin.site.register(message_guest)
-
-admin.site.register(message_guest)
-admin.site.register(Pendaftaran, PendaftaranAdmin)
-admin.site.register(Portfolio_Item)
-admin.site.register(Portfolio_tag)
-admin.site.register(Post, PostAdmin)
-admin.site.register(Service_Item)
-admin.site.register(Team_Member)
-admin.site.register(testimonial)
-admin.site.register(testimonial_Item)
-
-
-
-# ========================================================
+    list_filter = ('jenis_kelamin', 'agama', 'asal_sekolah')
+    readonly_fields = ('created_at',)
