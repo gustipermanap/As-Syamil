@@ -1,33 +1,24 @@
 {% load static %}
-
-    <!-- Call To Action Section -->
-    <section id="call-to-action" class="call-to-action section dark-background">
-
-      {% for cta in cta %}
-        <div class="container">
-          
-            <img src="{{ cta.image_background.url }}" alt="">
-        {% endfor %}
-          
-          <div class="content row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
-            <div class="col-xl-10">
-              <div class="text-center">
-                
-                {% for fcta in cta %}
-                  
-                  {% if cta %}
-                    <a href="{{fcta.link}}" class="glightbox play-btn"></a>   
-                  {% else %}
-                  <a href="{{cta.video_upload}}" class="glightbox play-btn"></a>
-                  {% endif %}
-                  <h3>{{fcta.title}}</h3>
-                  <p>{{cta.description}}</p>
-                  <a class="cta-btn" href="#">Call To Action</a>
-                {% endfor %}
-                  
-              </div>
-            </div>
+<section id="call-to-action" class="call-to-action section dark-background">
+  {% for item in cta_list %}
+    <div class="container">
+      {% if item.image_background %}
+        <img src="{{ item.image_background.url }}" alt="">
+      {% endif %}
+      <div class="content row justify-content-center" data-aos="zoom-in" data-aos-delay="100">
+        <div class="col-xl-10">
+          <div class="text-center">
+            {% if item.link %}
+              <a href="{{ item.link }}" class="glightbox play-btn"></a>
+            {% elif item.video_upload %}
+              <a href="{{ item.video_upload.url }}" class="glightbox play-btn"></a>
+            {% endif %}
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+            <a class="cta-btn" href="{% url 'pendaftaran' %}">{{ item.text_button|default:"Daftar Sekarang" }}</a>
           </div>
         </div>
-  
-      </section><!-- /Call To Action Section -->
+      </div>
+    </div>
+  {% endfor %}
+</section>

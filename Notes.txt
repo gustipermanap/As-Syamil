@@ -1,4 +1,7 @@
-1. UI/UX sudah sesuai
-2. Import Image
-3. masukan asset ke static
-4. Arahkan navbar
+Website + CMS saja (Django Admin).
+Bukan SIA / portal siswa / sistem pembayaran.
+
+Setelah deploy produksi:
+- set DJANGO_DEBUG=False
+- ganti DJANGO_SECRET_KEY
+- isi Data Sekolah, periode PPDB, dan nomor WhatsApp di admin
