@@ -55,6 +55,14 @@ Di issue GitHub, komentar:
 @cursor Kerjakan issue ini saja. Ikuti AGENTS.md dan docs/09-runbook-otomasi.md.
 ```
 
+## Issue GitHub yang sudah dibuat
+
+Epik: https://github.com/gustipermanap/As-Syamil/issues/3
+
+SIA-001 #4 … SIA-024 #27 (satu issue per modul backlog).
+
+Jika label `sia-ready` belum ada, buat di GitHub (Settings → Labels) lalu pakai sebagai pemicu Automation.
+
 ## Label
 
 | Label | Arti |
