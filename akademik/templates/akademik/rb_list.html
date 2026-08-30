@@ -1,0 +1,15 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Rombongan belajar{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Rombongan belajar</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'akademik:rb_baru' %}">RB baru</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'akademik:ruang_baru' %}">Ruang belajar</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'akademik:mapel' %}">Kitab / mapel</a>
+</p>
+<ul>
+  {% for r in daftar %}
+    <li><a href="{% url 'akademik:rb_detail' r.pk %}">{{ r }}</a></li>
+  {% empty %}<li>Belum ada RB.</li>{% endfor %}
+</ul>
+{% endblock %}

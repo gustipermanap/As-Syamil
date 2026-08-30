@@ -1,0 +1,23 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Pelanggaran{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Kedisiplinan</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'kesiswaan:pelanggaran_baru' %}">Catat</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'kesiswaan:jenis_pelanggaran_baru' %}">Jenis</a>
+</p>
+<table class="table table-sm">
+  <thead><tr><th>Tanggal</th><th>Santri</th><th>Jenis</th><th>Poin</th><th>Sanksi</th></tr></thead>
+  <tbody>
+  {% for p in daftar %}
+    <tr>
+      <td>{{ p.tanggal }}</td>
+      <td>{{ p.santri }}</td>
+      <td>{{ p.jenis }}</td>
+      <td>{{ p.jenis.poin }}</td>
+      <td>{{ p.sanksi }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">Belum ada catatan.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

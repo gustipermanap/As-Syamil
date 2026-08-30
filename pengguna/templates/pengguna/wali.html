@@ -1,0 +1,36 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Portal wali santri{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Portal wali santri</h1>
+<p class="small text-muted">Data anak dipakai untuk pendidikan di pesantren dan tidak dipublikasikan.</p>
+<p><a class="btn btn-success btn-sm" href="{% url 'kesiswaan:izin_wali' %}">Ajukan izin</a></p>
+{% for s in anak %}
+  <div class="card mb-3 p-3">
+    <h2 class="h5">{{ s.nama }} <small class="text-muted">{{ s.nomor_induk_santri }}</small></h2>
+    <p>Status: {{ s.get_status_display }}</p>
+    <a href="{% url 'pengguna:rapor' s.pk %}">Lihat rapor</a>
+  </div>
+{% empty %}
+  <p>Belum ada data anak yang tertaut.</p>
+{% endfor %}
+<h2 class="h5 mt-4">Tagihan</h2>
+<ul>
+  {% for t in tagihan %}
+    <li>{{ t.santri.nama }} — {{ t.jenis }} — {{ t.get_status_display }} (sisa {{ t.sisa }})</li>
+  {% empty %}
+    <li>Tidak ada tagihan.</li>
+  {% endfor %}
+</ul>
+<h2 class="h5 mt-4">Izin terakhir</h2>
+<ul>
+  {% for i in izin %}
+    <li>{{ i.santri.nama }} — {{ i.get_jenis_display }} — {{ i.get_status_display }}</li>
+  {% empty %}<li>Belum ada izin.</li>{% endfor %}
+</ul>
+<h2 class="h5 mt-4">Setoran hafalan</h2>
+<ul>
+  {% for s in setoran %}
+    <li>{{ s.santri.nama }} — {{ s.get_jenis_display }} {{ s.tanggal }} ({{ s.get_mutu_display }})</li>
+  {% empty %}<li>Belum ada setoran.</li>{% endfor %}
+</ul>
+{% endblock %}

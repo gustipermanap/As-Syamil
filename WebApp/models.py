@@ -340,6 +340,28 @@ class Pendaftaran(models.Model):
     alamat_orangtua = models.TextField()
     foto = models.ImageField(upload_to='photos/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+    gelombang = models.ForeignKey(
+        'ppdb.GelombangPPDB',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pendaftar',
+    )
+    kode_pendaftaran = models.CharField(max_length=20, blank=True, unique=True, null=True)
+    status = models.CharField(
+        max_length=30,
+        default='dikirim',
+        choices=[
+            ('dikirim', 'Dikirim'),
+            ('berkas_kurang', 'Berkas kurang'),
+            ('verifikasi', 'Verifikasi'),
+            ('tes', 'Tes'),
+            ('diterima', 'Diterima'),
+            ('cadangan', 'Cadangan'),
+            ('ditolak', 'Ditolak'),
+            ('mengundurkan_diri', 'Mengundurkan diri'),
+        ],
+    )
 
     class Meta:
         verbose_name = 'Pendaftaran PPDB'

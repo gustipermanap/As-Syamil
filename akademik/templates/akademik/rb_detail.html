@@ -1,0 +1,18 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}{{ rb }}{% endblock %}
+{% block isi %}
+<h1 class="h3">{{ rb }}</h1>
+<p>
+  <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_anggota' rb.pk %}">Tambah anggota</a>
+  <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_pengampu' rb.pk %}">Pengampu</a>
+  <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_mapel' rb.pk %}">Pasang mapel</a>
+</p>
+<h2 class="h5">Anggota</h2>
+<ul>{% for a in anggota %}<li>{{ a.santri }}</li>{% empty %}<li>Kosong.</li>{% endfor %}</ul>
+<h2 class="h5">Pengampu</h2>
+<ul>{% for p in pengampu %}<li>{{ p.pegawai }}{% if p.sebagai_wali %} (wali RB){% endif %}</li>{% empty %}<li>—</li>{% endfor %}</ul>
+<h2 class="h5">Mapel</h2>
+<ul>{% for m in mapel %}<li>{{ m.mapel }}</li>{% empty %}<li>—</li>{% endfor %}</ul>
+<h2 class="h5">Jadwal</h2>
+<ul>{% for j in jadwal %}<li>{{ j.get_hari_display }} {{ j.jam_mulai }} {{ j.mapel }}</li>{% empty %}<li>—</li>{% endfor %}</ul>
+{% endblock %}

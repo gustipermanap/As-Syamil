@@ -11,6 +11,13 @@ admin.site.index_title = 'Selamat datang di CMS As-Syamil'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
+    path('', include('pengguna.urls')),
+    path('', include('ppdb.urls')),
+    path('', include('lembaga.urls')),
+    path('', include('kesiswaan.urls')),
+    path('', include('akademik.urls')),
+    path('', include('tahfidz.urls')),
+    path('', include('keuangan.urls')),
     path('', include('WebApp.urls')),
 ]
 

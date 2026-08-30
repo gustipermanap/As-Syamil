@@ -1,0 +1,20 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Jadwal{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Jadwal mingguan</h1>
+<p><a class="btn btn-success btn-sm" href="{% url 'akademik:jadwal_baru' %}">Slot baru</a></p>
+<table class="table table-sm">
+  <thead><tr><th>Hari</th><th>Jam</th><th>RB</th><th>Mapel</th><th>Pengampu</th></tr></thead>
+  <tbody>
+  {% for j in daftar %}
+    <tr>
+      <td>{{ j.get_hari_display }}</td>
+      <td>{{ j.jam_mulai }}–{{ j.jam_selesai }}</td>
+      <td>{{ j.rb }}</td>
+      <td>{{ j.mapel }}</td>
+      <td>{{ j.pengampu }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">Belum ada jadwal.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

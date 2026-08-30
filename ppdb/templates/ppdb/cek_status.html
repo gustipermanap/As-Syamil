@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Cek status PPDB{% endblock %}
+{% block content %}
+<br><br><br>
+<section class="section">
+  <div class="container" style="max-width:520px;">
+    <h2>Cek status pendaftaran</h2>
+    <p class="small text-muted">Data dipakai untuk penerimaan dan pendidikan, tidak dipublikasikan.</p>
+    <form method="post">{% csrf_token %}
+      <label>Kode pendaftaran</label>
+      <input class="form-control mb-2" name="kode" required>
+      <label>Tanggal lahir</label>
+      <input class="form-control mb-3" type="date" name="tanggal_lahir">
+      <button class="btn btn-primary" type="submit">Cek</button>
+    </form>
+    {% if hasil %}
+      <div class="alert alert-success mt-3">
+        {{ hasil.nama_lengkap }} — status: <strong>{{ hasil.get_status_display }}</strong>
+      </div>
+    {% elif request.method == 'POST' %}
+      <div class="alert alert-warning mt-3">Data tidak ditemukan.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Terima pembayaran{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Terima pembayaran</h1>
+<p>{{ tagihan.santri }} — {{ tagihan.jenis }} · sisa {{ tagihan.sisa }}</p>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="post">{% csrf_token %}
+  <div class="mb-3"><label class="form-label">Jumlah</label><input class="form-control" name="jumlah" type="number" step="0.01" max="{{ tagihan.sisa }}" required></div>
+  <div class="mb-3">
+    <label class="form-label">Metode</label>
+    <select class="form-control" name="metode">
+      <option value="tunai">Tunai</option>
+      <option value="transfer">Transfer</option>
+      <option value="lainnya">Lainnya</option>
+    </select>
+  </div>
+  <button class="btn btn-success" type="submit">Simpan</button>
+</form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Portal santri{% endblock %}
+{% block isi %}
+<h1 class="h3">Portal santri</h1>
+{% if santri %}
+  <p>{{ santri.nama }} · {{ santri.nomor_induk_santri }} · {{ santri.get_status_display }}</p>
+  {% if progress %}
+    <p>Hafalan: {{ progress.juz_selesai }} juz selesai, halaman {{ progress.halaman_berjalan }}.</p>
+  {% endif %}
+  <h2 class="h5">Setoran</h2>
+  <ul>
+    {% for s in setoran %}
+      <li>{{ s.get_jenis_display }} {{ s.tanggal }} — {{ s.get_mutu_display }}</li>
+    {% empty %}<li>Belum ada setoran.</li>{% endfor %}
+  </ul>
+  <h2 class="h5">Izin</h2>
+  <ul>
+    {% for i in izin %}
+      <li>{{ i.get_jenis_display }} — {{ i.get_status_display }}</li>
+    {% empty %}<li>Belum ada izin.</li>{% endfor %}
+  </ul>
+{% else %}
+  <p>Akun ini belum tertaut ke data santri.</p>
+{% endif %}
+{% endblock %}

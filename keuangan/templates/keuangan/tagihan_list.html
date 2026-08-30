@@ -1,0 +1,25 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Tagihan{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Tagihan / syahriyah</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'keuangan:generate' %}">Generate massal</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'keuangan:jenis_baru' %}">Jenis tagihan</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?status=belum">Belum</a>
+</p>
+<table class="table table-sm">
+  <thead><tr><th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Sisa</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for t in daftar %}
+    <tr>
+      <td>{{ t.santri }}</td>
+      <td>{{ t.jenis }}</td>
+      <td>{{ t.jumlah }}</td>
+      <td>{{ t.sisa }}</td>
+      <td>{{ t.get_status_display }}</td>
+      <td>{% if t.status != 'lunas' and t.status != 'batal' %}<a href="{% url 'keuangan:bayar' t.pk %}">Terima bayar</a>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6">Belum ada tagihan.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

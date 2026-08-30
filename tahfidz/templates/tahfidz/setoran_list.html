@@ -1,0 +1,27 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Setoran hafalan{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Setoran hafalan</h1>
+<p><a class="btn btn-success btn-sm" href="{% url 'tahfidz:setoran_baru' %}">Catat setoran</a></p>
+<h2 class="h5">Progress</h2>
+<ul>
+  {% for p in progress %}
+    <li>{{ p.santri }} — {{ p.juz_selesai }} juz, halaman {{ p.halaman_berjalan }}</li>
+  {% empty %}<li>Belum ada progress.</li>{% endfor %}
+</ul>
+<h2 class="h5">Riwayat</h2>
+<table class="table table-sm">
+  <thead><tr><th>Tanggal</th><th>Santri</th><th>Jenis</th><th>Mutu</th><th>Juz</th></tr></thead>
+  <tbody>
+  {% for s in daftar %}
+    <tr>
+      <td>{{ s.tanggal }}</td>
+      <td>{{ s.santri }}</td>
+      <td>{{ s.get_jenis_display }}</td>
+      <td>{{ s.get_mutu_display }}</td>
+      <td>{{ s.dari_juz }}:{{ s.dari_halaman }}–{{ s.sampai_juz }}:{{ s.sampai_halaman }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="5">Belum ada setoran.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

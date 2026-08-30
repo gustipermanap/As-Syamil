@@ -1,0 +1,20 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Unit pendidikan{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Unit dan jenjang</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'lembaga:unit_baru' %}">Unit baru</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'lembaga:jenjang_baru' %}">Jenjang baru</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'lembaga:tahun' %}">Tahun ajaran</a>
+</p>
+{% for u in daftar %}
+  <div class="card mb-2 p-3">
+    <strong>{{ u.nama }}</strong> · {{ u.get_tipe_display }} · {{ u.aktif|yesno:"Aktif,Nonaktif" }}
+    <ul class="mb-0">
+      {% for j in u.jenjang.all %}
+        <li>{{ j.nama }} (urutan {{ j.urutan }})</li>
+      {% empty %}<li class="text-muted">Belum ada jenjang.</li>{% endfor %}
+    </ul>
+  </div>
+{% empty %}<p>Belum ada unit.</p>{% endfor %}
+{% endblock %}

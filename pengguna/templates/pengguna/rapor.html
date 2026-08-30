@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Rapor {{ santri.nama }}</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #333; padding: 6px; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <p class="no-print"><button onclick="window.print()">Cetak / unduh PDF</button></p>
+  <h1>Rapor santri</h1>
+  <p>{{ pengaturan.nama_tampil }}</p>
+  <p><strong>{{ santri.nama }}</strong> · {{ santri.nomor_induk_santri }}</p>
+  <table>
+    <thead><tr><th>Kitab / mapel</th><th>Jenis</th><th>Nilai</th><th>Predikat</th><th>Periode</th></tr></thead>
+    <tbody>
+    {% for n in nilai %}
+      <tr>
+        <td>{{ n.mapel }}</td>
+        <td>{{ n.get_jenis_display }}</td>
+        <td>{{ n.nilai }}</td>
+        <td>{{ n.predikat }}</td>
+        <td>{{ n.periode }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">Belum ada nilai.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

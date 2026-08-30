@@ -24,7 +24,7 @@ class MessageForm(forms.ModelForm):
 class PendaftaranForm(forms.ModelForm):
     class Meta:
         model = Pendaftaran
-        exclude = ['created_at']
+        exclude = ['created_at', 'gelombang', 'kode_pendaftaran', 'status']
         widgets = {
             'tanggal_lahir': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'tgl_no_ijazah': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),

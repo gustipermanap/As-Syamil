@@ -2,6 +2,10 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from django.utils import timezone
+from datetime import timedelta
+
+from ppdb.models import GelombangPPDB
 from .models import DataSekolah, Pendaftaran, Post, message
 
 
@@ -54,6 +58,14 @@ class WebsiteTests(TestCase):
             ppdb_periode='1 Mei 2026 - 30 Juni 2026',
             open_hours='Senin-Sabtu: 07.00 - 16.00',
         )
+        now = timezone.now()
+        GelombangPPDB.objects.create(
+            nama='Gelombang uji',
+            mulai=now - timedelta(days=1),
+            selesai=now + timedelta(days=30),
+            kuota=100,
+            status=GelombangPPDB.DIBUKA,
+        )
         author = User.objects.create_user(username='admincms', password='pass')
         Post.objects.create(
             title='Kegiatan Pondok',
@@ -67,10 +79,10 @@ class WebsiteTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'As-Syamil')
         self.assertContains(response, 'Kegiatan Pondok')
-        self.assertContains(response, reverse('admin:index'))
+        self.assertContains(response, reverse('pengguna:masuk'))
 
     def test_login_bukan_beranda(self):
-        self.assertNotEqual(reverse('admin:index'), reverse('home'))
+        self.assertNotEqual(reverse('pengguna:masuk'), reverse('home'))
         response = self.client.get(reverse('admin:index'), follow=False)
         self.assertIn(response.status_code, (200, 302))
         if response.status_code == 302:
@@ -102,13 +114,16 @@ class WebsiteTests(TestCase):
         response = self.client.get(reverse('pendaftaran'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'enctype="multipart/form-data"')
-        self.assertContains(response, '1 Mei 2026 - 30 Juni 2026')
+        self.assertContains(response, 'Gelombang uji')
 
     def test_ppdb_menyimpan_dan_redirect_sukses(self):
         response = self.client.post(reverse('pendaftaran'), _ppdb_payload())
         self.assertRedirects(response, reverse('pendaftaran_sukses'))
         self.assertEqual(Pendaftaran.objects.count(), 1)
-        self.assertEqual(Pendaftaran.objects.get().nama_lengkap, 'Ahmad Fulan')
+        obj = Pendaftaran.objects.get()
+        self.assertEqual(obj.nama_lengkap, 'Ahmad Fulan')
+        self.assertTrue(obj.kode_pendaftaran)
+        self.assertEqual(obj.status, 'dikirim')
 
     def test_ppdb_sukses_halaman(self):
         response = self.client.get(reverse('pendaftaran_sukses'))

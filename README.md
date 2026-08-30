@@ -1,23 +1,16 @@
-<<<<<<< HEAD
 # Pondok Pesantren As-Syamil
 
-Saat ini repositori ini berisi website publik dan CMS.
+Website publik, CMS, dan **Sistem Akademik Pesantren** untuk Pondok Pesantren As-Syamil, Pandeglang.
 
-Arah berikutnya: **Sistem Akademik Pesantren**. Seluruh keputusan, modul, backlog 4 minggu, dan aturan agent ada di [docs/README.md](docs/README.md).
-=======
-# Website CMS Pondok Pesantren As-Syamil
+Keputusan produk, modul, backlog, dan aturan agent ada di [docs/README.md](docs/README.md).
 
-Website publik dan panel CMS (Django Admin) untuk Pondok Pesantren As-Syamil, Pandeglang.
+## Yang sudah ada
 
-Ini **bukan** sistem akademik. Tidak ada portal siswa, absensi, nilai, keuangan, atau pembayaran. Admin mengelola konten beranda, blog, pesan tamu, dan data pendaftaran PPDB melalui `/admin/`.
-
-## Fitur
-
-- Beranda dinamis: hero, tentang, sponsor, ajakan, program, testimoni, galeri, pengurus, berita
-- Blog / berita
-- Formulir kontak
-- Formulir PPDB (disimpan ke database, dilihat di admin)
-- CMS lewat Django Admin + editor TinyMCE untuk isi artikel
+- Website publik: beranda, program, galeri, pengurus, blog, kontak
+- Formulir PPDB publik yang patuh gelombang (buka/tutup)
+- CMS konten lewat Django Admin + TinyMCE (`/admin/`)
+- Portal operasional (`/masuk/`, `/operasi/`, `/wali/`, `/santri/`)
+- Modul: lembaga, pengguna, kesiswaan, PPDB, akademik, tahfidz, keuangan
 
 ## Menjalankan secara lokal
 
@@ -27,12 +20,16 @@ source env/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # opsional
 python manage.py migrate
+python manage.py seed_operasi   # data contoh operasional
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
 - Website: http://127.0.0.1:8000/
-- CMS: http://127.0.0.1:8000/admin/
+- Masuk staf / wali / santri: http://127.0.0.1:8000/masuk/
+- CMS web: http://127.0.0.1:8000/admin/
+
+Akun contoh dari `seed_operasi` memakai sandi `sandi123` (mudir, tu, bendahara, ustadz1, musyrif1, wali1, wali2).
 
 ## Produksi
 
@@ -48,4 +45,3 @@ Jangan mengunggah `db.sqlite3`, folder `env/`, atau `.env` ke git.
 ## Lisensi
 
 MIT © Gusti Permana Putra
->>>>>>> origin/main

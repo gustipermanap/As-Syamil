@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Kwitansi {{ bayaran.nomor_kwitansi }}</title>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <p class="no-print"><a href="{% url 'keuangan:tagihan' %}">Kembali</a> · <button onclick="window.print()">Cetak</button></p>
+  <h1>Kwitansi</h1>
+  <p>Nomor: <strong>{{ bayaran.nomor_kwitansi }}</strong></p>
+  <p>Telah diterima dari wali/santri <strong>{{ bayaran.tagihan.santri.nama }}</strong></p>
+  <p>Jenis: {{ bayaran.tagihan.jenis }}</p>
+  <p>Jumlah: Rp {{ bayaran.jumlah }}</p>
+  <p>Metode: {{ bayaran.get_metode_display }} · Tanggal: {{ bayaran.tanggal }}</p>
+  <p>Penerima: {{ bayaran.penerima }}</p>
+</body>
+</html>

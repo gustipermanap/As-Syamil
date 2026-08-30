@@ -9,15 +9,28 @@
   <div class="container section-title" data-aos="fade-up">
     <h2>Penerimaan Peserta Didik Baru (PPDB)</h2>
     <p>Selamat datang di halaman PPDB {{ sekolah.nama_sekolah|default:"Pesantren As-Syamil" }}.</p>
-    {% if sekolah.ppdb_periode %}
+    {% if gelombang %}
+      <h3>{{ gelombang.nama }}</h3>
+      <p>Kuota: {{ gelombang.kuota }}</p>
+    {% elif sekolah.ppdb_periode %}
       <h3>Periode pendaftaran</h3>
       <p>{{ sekolah.ppdb_periode }}</p>
     {% endif %}
+    {% if ditutup %}
+      <p class="mt-3"><strong>Pendaftaran ditutup.</strong>
+        {% if berikutnya %}Periode berikutnya: {{ berikutnya.nama }}
+        ({{ berikutnya.mulai|date:"j F Y" }} – {{ berikutnya.selesai|date:"j F Y" }}).{% endif %}
+        Silakan cek status dengan kode di
+        <a href="{% url 'ppdb:cek_status' %}">halaman cek status</a>.</p>
+    {% endif %}
+    <p class="small text-muted mt-2">Data dipakai untuk penerimaan dan pendidikan pesantren, tidak dipublikasikan.
+      <a href="{% url 'ppdb:cek_status' %}">Cek status pendaftaran</a></p>
   </div>
 
   <div class="container" data-aos="fade-up" data-aos-delay="100">
     <div class="row justify-content-center">
       <div class="col-lg-8">
+        {% if form %}
         <form action="{% url 'pendaftaran' %}" method="post" enctype="multipart/form-data" data-aos="fade" data-aos-delay="100">
           {% csrf_token %}
           {% if form.errors %}
@@ -152,6 +165,7 @@
             </div>
           </div>
         </form>
+        {% endif %}
       </div>
     </div>
   </div>

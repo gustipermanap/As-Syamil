@@ -1,0 +1,25 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Asrama{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Asrama</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'kesiswaan:gedung_baru' %}">Gedung</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'kesiswaan:kamar_baru' %}">Kamar</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'kesiswaan:penempatan_baru' %}">Penempatan</a>
+</p>
+<h2 class="h5">Kamar</h2>
+<table class="table table-sm">
+  <thead><tr><th>Gedung</th><th>Kamar</th><th>Kapasitas</th><th>Terisi</th></tr></thead>
+  <tbody>
+  {% for k in kamar %}
+    <tr><td>{{ k.gedung }}</td><td>{{ k.nama }}</td><td>{{ k.kapasitas }}</td><td>{{ k.terisi }}</td></tr>
+  {% empty %}<tr><td colspan="4">Belum ada kamar.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<h2 class="h5">Penempatan aktif</h2>
+<ul>
+  {% for p in penempatan %}
+    <li>{{ p.santri }} → {{ p.kamar }} (masuk {{ p.masuk }})</li>
+  {% empty %}<li>Belum ada penempatan.</li>{% endfor %}
+</ul>
+{% endblock %}

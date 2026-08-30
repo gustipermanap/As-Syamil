@@ -1,0 +1,14 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Kitab / mapel{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Kitab dan mata pelajaran</h1>
+<p><a class="btn btn-success btn-sm" href="{% url 'akademik:mapel_baru' %}">Tambah</a></p>
+<table class="table table-sm">
+  <thead><tr><th>Nama</th><th>Unit</th><th>Jenis</th></tr></thead>
+  <tbody>
+  {% for m in daftar %}
+    <tr><td>{{ m.nama }}</td><td>{{ m.unit }}</td><td>{{ m.get_jenis_display }}</td></tr>
+  {% empty %}<tr><td colspan="3">Belum ada.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

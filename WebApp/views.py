@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 from .forms import MessageForm, PendaftaranForm
 from .models import (
@@ -19,6 +19,10 @@ from .models import (
     testimonial,
     testimonial_Item,
 )
+from django.shortcuts import get_object_or_404
+
+from ppdb.models import gelombang_berikutnya, gelombang_terbuka
+from ppdb.services import buat_kode
 
 
 def home(request):
@@ -72,23 +76,38 @@ def success_view(request):
 
 
 def pendaftaran_view(request):
+    gelombang = gelombang_terbuka()
+    berikutnya = None if gelombang else gelombang_berikutnya()
     if request.method == 'POST':
+        if not gelombang:
+            messages.error(request, 'Pendaftaran ditutup.')
+            return render(request, 'pages/ppdb.html', {
+                'form': None, 'gelombang': None, 'ditutup': True, 'berikutnya': berikutnya,
+            })
         form = PendaftaranForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Pendaftaran berhasil dikirim.')
+            obj = form.save(commit=False)
+            obj.gelombang = gelombang
+            obj.status = 'dikirim'
+            obj.kode_pendaftaran = buat_kode()
+            obj.save()
+            messages.success(request, f'Pendaftaran terkirim. Kode Anda: {obj.kode_pendaftaran}')
             return redirect('pendaftaran_sukses')
         messages.error(request, 'Periksa kembali isian formulir PPDB.')
     else:
-        form = PendaftaranForm()
-
-    return render(request, 'pages/ppdb.html', {'form': form})
+        form = PendaftaranForm() if gelombang else None
+    return render(request, 'pages/ppdb.html', {
+        'form': form,
+        'gelombang': gelombang,
+        'ditutup': gelombang is None,
+        'berikutnya': berikutnya,
+    })
 
 
 def pendaftaran_sukses_view(request):
     return render(request, 'pages/success.html', {
         'page_title': 'Pendaftaran terkirim',
-        'page_text': 'Terima kasih. Data calon peserta didik sudah kami terima.',
+        'page_text': 'Simpan kode pendaftaran yang tampil di notifikasi untuk cek status.',
         'back_url_name': 'home',
         'back_label': 'Kembali ke beranda',
     })

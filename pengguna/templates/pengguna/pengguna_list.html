@@ -1,0 +1,18 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Pengguna{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Pengguna internal</h1>
+<table class="table table-sm">
+  <thead><tr><th>Nama pengguna</th><th>Grup</th><th>Aktif</th><th></th></tr></thead>
+  <tbody>
+  {% for u in daftar %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+      <td>{{ u.is_active|yesno:"Ya,Tidak" }}</td>
+      <td><a href="{% url 'pengguna:reset_sandi' u.pk %}">Reset sandi</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

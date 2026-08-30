@@ -1,0 +1,103 @@
+from django import forms
+from django.contrib import messages
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView
+
+from pengguna.forms_util import kelas_bootstrap
+from pengguna.mixins import OperasiMixin, butuh_operasi
+from pengguna.models import GRUP_TU
+from pengguna.services import user_punya_grup
+from WebApp.models import Pendaftaran
+from .models import GelombangPPDB
+from .services import terima_menjadi_santri
+
+
+class GelombangForm(forms.ModelForm):
+    class Meta:
+        model = GelombangPPDB
+        fields = ['nama', 'mulai', 'selesai', 'kuota', 'status', 'biaya_pendaftaran', 'unit_tujuan']
+        widgets = {
+            'mulai': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'selesai': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class AntrianPPDB(OperasiMixin, ListView):
+    model = Pendaftaran
+    template_name = 'ppdb/antrian.html'
+    context_object_name = 'daftar'
+    paginate_by = 50
+
+    def get_queryset(self):
+        qs = Pendaftaran.objects.select_related('gelombang').order_by('-id')
+        status = self.request.GET.get('status')
+        if status:
+            qs = qs.filter(status=status)
+        return qs
+
+
+class DaftarGelombang(OperasiMixin, ListView):
+    model = GelombangPPDB
+    template_name = 'ppdb/gelombang.html'
+    context_object_name = 'daftar'
+
+
+class TambahGelombang(OperasiMixin, CreateView):
+    form_class = GelombangForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('ppdb:gelombang')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = 'Gelombang PPDB'
+        return ctx
+
+
+class UbahGelombang(OperasiMixin, UpdateView):
+    model = GelombangPPDB
+    form_class = GelombangForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('ppdb:gelombang')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = 'Ubah gelombang'
+        return ctx
+
+
+@butuh_operasi
+def ubah_status(request, pk, status):
+    if not (
+        request.user.is_superuser
+        or user_punya_grup(request.user, [GRUP_TU, 'mudir'])
+    ):
+        return HttpResponseForbidden('Hanya Tata Usaha yang mengubah status PPDB.')
+    pendaftar = get_object_or_404(Pendaftaran, pk=pk)
+    pendaftar.status = status
+    pendaftar.save(update_fields=['status'])
+    if status == 'diterima':
+        santri = terima_menjadi_santri(pendaftar)
+        messages.success(request, f'{pendaftar.nama_lengkap} menjadi santri {santri.nomor_induk_santri}.')
+    else:
+        messages.success(request, f'Status {pendaftar.nama_lengkap} diubah.')
+    return redirect('ppdb:antrian')
+
+
+def cek_status(request):
+    hasil = None
+    if request.method == 'POST':
+        kode = request.POST.get('kode', '').strip()
+        tgl = request.POST.get('tanggal_lahir', '')
+        qs = Pendaftaran.objects.filter(kode_pendaftaran__iexact=kode)
+        if tgl:
+            qs = qs.filter(tanggal_lahir=tgl)
+        hasil = qs.first()
+    return render(request, 'ppdb/cek_status.html', {'hasil': hasil})

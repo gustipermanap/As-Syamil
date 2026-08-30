@@ -1,0 +1,31 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Antrian PPDB{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Antrian PPDB</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'ppdb:gelombang' %}">Gelombang</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?status=dikirim">Dikirim</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?">Semua</a>
+</p>
+<table class="table table-sm">
+  <thead><tr><th>Nama</th><th>Kode</th><th>Gelombang</th><th>Status</th><th>Aksi</th></tr></thead>
+  <tbody>
+  {% for p in daftar %}
+    <tr>
+      <td>{{ p.nama_lengkap }}</td>
+      <td>{{ p.kode_pendaftaran }}</td>
+      <td>{{ p.gelombang }}</td>
+      <td>{{ p.get_status_display }}</td>
+      <td>
+        <a href="{% url 'ppdb:ubah_status' p.pk 'verifikasi' %}">Verifikasi</a> ·
+        <a href="{% url 'ppdb:ubah_status' p.pk 'tes' %}">Tes</a> ·
+        <a href="{% url 'ppdb:ubah_status' p.pk 'diterima' %}">Terima jadi santri</a> ·
+        <a href="{% url 'ppdb:ubah_status' p.pk 'ditolak' %}">Tolak</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">Belum ada pendaftar.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Tahun ajaran{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Tahun ajaran dan periode</h1>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'lembaga:tahun_baru' %}">Tahun ajaran baru</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'lembaga:periode_baru' %}">Periode baru</a>
+</p>
+{% for t in daftar %}
+  <div class="card mb-2 p-3">
+    <strong>{{ t.nama }}</strong> {{ t.aktif|yesno:"(aktif)," }}
+    <ul class="mb-0">
+      {% for p in t.periode.all %}
+        <li>{{ p.nama }} {{ p.mulai }} – {{ p.selesai }} {{ p.aktif|yesno:"(aktif)," }}</li>
+      {% empty %}<li>Belum ada periode.</li>{% endfor %}
+    </ul>
+  </div>
+{% empty %}<p>Belum ada tahun ajaran.</p>{% endfor %}
+{% endblock %}

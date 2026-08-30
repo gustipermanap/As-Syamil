@@ -1,0 +1,26 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Isi absensi{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Absensi {{ pertemuan.rb }} — {{ pertemuan.tanggal }}</h1>
+<p>{{ pertemuan.mapel }}</p>
+<form method="post">{% csrf_token %}
+<table class="table table-sm">
+  <thead><tr><th>Santri</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for b in baris %}
+    <tr>
+      <td>{{ b.santri.nama }}</td>
+      <td>
+        <select class="form-control" name="status_{{ b.santri.id }}">
+          {% for val, label in pilihan %}
+            <option value="{{ val }}"{% if b.status == val %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+  {% empty %}<tr><td colspan="2">RB belum punya anggota.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<button class="btn btn-success" type="submit">Simpan absensi</button>
+</form>
+{% endblock %}

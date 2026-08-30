@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Operasional As-Syamil{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'pengguna:operasi' %}">Operasional Pesantren</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navop">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navop">
+      {% if menu.operasi %}
+      <ul class="navbar-nav me-auto">
+        {% if menu.ppdb %}<li class="nav-item"><a class="nav-link" href="{% url 'ppdb:antrian' %}">PPDB</a></li>{% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:santri' %}">Santri</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:pegawai' %}">Pegawai</a></li>
+        {% if menu.akademik %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'akademik:rb' %}">RB</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'akademik:jadwal' %}">Jadwal</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'akademik:absensi' %}">Absensi</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'akademik:nilai' %}">Nilai</a></li>
+        {% endif %}
+        {% if menu.tahfidz %}<li class="nav-item"><a class="nav-link" href="{% url 'tahfidz:setoran' %}">Setoran</a></li>{% endif %}
+        {% if menu.asrama %}<li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:asrama' %}">Asrama</a></li>{% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:izin' %}">Izin</a></li>
+        {% if menu.kedisiplinan %}<li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:pelanggaran' %}">Pelanggaran</a></li>{% endif %}
+        {% if menu.boleh_keuangan %}<li class="nav-item"><a class="nav-link" href="{% url 'keuangan:tagihan' %}">Syahriyah</a></li>{% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'lembaga:pengaturan' %}">Lembaga</a></li>
+      </ul>
+      {% endif %}
+      <div class="d-flex align-items-center">
+        {% if user.is_authenticated %}
+          <span class="text-white me-3">{{ user.username }}</span>
+          <a class="btn btn-outline-light btn-sm" href="{% url 'pengguna:keluar' %}">Keluar</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container mb-5">
+  {% if messages %}
+    {% for m in messages %}<div class="alert alert-info">{{ m }}</div>{% endfor %}
+  {% endif %}
+  {% block isi %}{% endblock %}
+</div>
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

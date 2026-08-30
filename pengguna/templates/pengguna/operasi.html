@@ -1,0 +1,22 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Dasbor operasional{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-4">Dasbor operasional</h1>
+<div class="row g-3">
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">Santri aktif</div><div class="fs-3">{{ santri_aktif }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">PPDB masuk</div><div class="fs-3">{{ ppdb_masuk }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">Setoran hari ini</div><div class="fs-3">{{ setoran_hari_ini }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">Tunggakan</div><div class="fs-3">{{ tunggakan }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">Hadir hari ini</div><div class="fs-3">{{ hadir_hari_ini }}</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">Alpa tercatat</div><div class="fs-3">{{ alpa }}</div></div></div>
+</div>
+<p class="mt-2 text-muted">Pengelola keuangan: {{ pengaturan.get_pengelola_keuangan_display }}</p>
+<p class="mt-4 d-flex flex-wrap gap-2">
+  {% if menu.ppdb %}<a class="btn btn-outline-success" href="{% url 'ppdb:antrian' %}">Antrian PPDB</a>{% endif %}
+  <a class="btn btn-outline-success" href="{% url 'kesiswaan:santri' %}">Data santri</a>
+  {% if menu.akademik %}<a class="btn btn-outline-success" href="{% url 'akademik:absensi' %}">Absensi</a>{% endif %}
+  {% if menu.tahfidz %}<a class="btn btn-outline-success" href="{% url 'tahfidz:setoran' %}">Setoran</a>{% endif %}
+  {% if menu.boleh_keuangan %}<a class="btn btn-outline-success" href="{% url 'keuangan:tagihan' %}">Tagihan / syahriyah</a>{% endif %}
+  <a class="btn btn-outline-secondary" href="{% url 'pengguna:daftar' %}">Pengguna</a>
+</p>
+{% endblock %}

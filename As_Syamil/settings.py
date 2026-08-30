@@ -37,6 +37,13 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'tinymce',
     'WebApp',
+    'lembaga.apps.LembagaConfig',
+    'pengguna.apps.PenggunaConfig',
+    'kesiswaan.apps.KesiswaanConfig',
+    'ppdb.apps.PpdbConfig',
+    'akademik.apps.AkademikConfig',
+    'tahfidz.apps.TahfidzConfig',
+    'keuangan.apps.KeuanganConfig',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +70,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'WebApp.context_processors.site_identity',
+                'pengguna.context_processors.portal_menu',
             ],
         },
     },
@@ -97,6 +105,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/masuk/'
+LOGIN_REDIRECT_URL = '/operasi/'
+LOGOUT_REDIRECT_URL = '/masuk/'
 
 TINYMCE_DEFAULT_CONFIG = {
     'height': 360,

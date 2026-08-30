@@ -1,0 +1,16 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}{{ judul }}{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">{{ judul }}</h1>
+{% if deskripsi %}<p class="text-muted">{{ deskripsi }}</p>{% endif %}
+<form method="post"{% if enctype %} enctype="{{ enctype }}"{% endif %}>
+  {% csrf_token %}
+  {% if form %}
+    {{ form.as_p }}
+  {% elif form_html %}
+    {{ form_html|safe }}
+  {% endif %}
+  <button class="btn btn-success" type="submit">{{ submit_label|default:"Simpan" }}</button>
+  <a class="btn btn-link" href="javascript:history.back()">Batal</a>
+</form>
+{% endblock %}
