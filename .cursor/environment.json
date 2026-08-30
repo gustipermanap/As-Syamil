@@ -1,0 +1,4 @@
+{
+  "install": "python3 -m pip install --user -r requirements.txt",
+  "start": "python3 manage.py migrate --noinput"
+}

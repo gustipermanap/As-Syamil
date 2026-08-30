@@ -18,6 +18,7 @@ Baca berurutan:
 | 10 | [09-runbook-otomasi.md](09-runbook-otomasi.md) | Cara agent mengerjakan issue |
 | 11 | [10-kriteria-rilis.md](10-kriteria-rilis.md) | Definisi “siap operasional” |
 | 12 | [11-istilah.md](11-istilah.md) | Kamus istilah UI |
+| 13 | [12-otomasi-cursor.md](12-otomasi-cursor.md) | Cara memasang Cursor Automation |
 
 ## Keputusan yang sudah dikunci
 
