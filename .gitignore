@@ -1,0 +1,24 @@
+# Lingkungan & rahasia
+.env
+.env.*
+!.env.example
+env/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Django
+db.sqlite3
+*.log
+staticfiles/
+
+# Editor
+.DS_Store
+.idea/
+.vscode/

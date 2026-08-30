@@ -1,49 +1,40 @@
 {% load static %}
-<!-- About Section -->
 <section id="about" class="about section">
+  <div class="container section-title" data-aos="fade-up">
+    {% for judul in about %}
+      <h2>{{ judul.title }}</h2>
+      <p>{{ judul.description }}</p>
+    {% endfor %}
+  </div>
 
-    <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-      
-      {% for judul in about %}
-        <h2>{{judul.title}}<br></h2>
-        <p>{{judul.description}}</p>
-      {% endfor %}
-        
-    </div><!-- End Section Title -->
-
-    <div class="container">
-
-      <div class="row gy-4">
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-          
-          {% for pembuka in about %}
-            <h3>{{pembuka.image_title}}</h3>
-            <img src="{{pembuka.image}}" class="img-fluid rounded-4 mb-4" alt="">
-            <p>{{pembuka.image_content}}</p>
-            <p>{{pembuka.text}}</p>
-          {% endfor %}
-            </div>
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="250">
-          <div class="content ps-0 ps-lg-5">
-           
-      
-      {% for footerabout in about %}
-        <p>{{footerabout.about}}</p>
-      {% endfor %}
-            <div class="position-relative mt-4">
-              
-              {% for footend in about %}
-                <img src="{{footend.image_video}}" class="img-fluid rounded-4" alt="">
-                <a href="{{footend.Video_Url}}" class="glightbox pulsating-play-btn"></a>
-                <a href="{{footend.video_upload}}" class="glightbox pulsating-play-btn"></a>
-             
-              {% endfor %}
-                 </div>
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        {% for pembuka in about %}
+          <h3>{{ pembuka.image_title }}</h3>
+          {% if pembuka.image %}
+            <img src="{{ pembuka.image.url }}" class="img-fluid rounded-4 mb-4" alt="{{ pembuka.image_title|default:pembuka.title }}">
+          {% endif %}
+          <p>{{ pembuka.image_content }}</p>
+          <p>{{ pembuka.text }}</p>
+        {% endfor %}
+      </div>
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="250">
+        <div class="content ps-0 ps-lg-5">
+          <div class="position-relative mt-4">
+            {% for footend in about %}
+              {% if footend.image_video %}
+                <img src="{{ footend.image_video.url }}" class="img-fluid rounded-4" alt="">
+              {% endif %}
+              {% if footend.Video_Url %}
+                <a href="{{ footend.Video_Url }}" class="glightbox pulsating-play-btn"></a>
+              {% elif footend.video_upload %}
+                <a href="{{ footend.video_upload.url }}" class="glightbox pulsating-play-btn"></a>
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
       </div>
-
     </div>
-
-  </section><!-- /About Section -->
+  </div>
+</section>
