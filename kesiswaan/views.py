@@ -385,7 +385,8 @@ def absensi_asrama(request):
     tanggal = request.POST.get('tanggal') or request.GET.get('tanggal') or date.today().isoformat()
     sesi = request.POST.get('sesi') or request.GET.get('sesi') or 'malam'
     santri_asrama = Santri.objects.filter(
-        status='aktif', penempatan_kamar__keluar__isnull=True,
+        status='aktif',
+        pk__in=PenempatanKamar.objects.filter(keluar__isnull=True).values('santri'),
     ).distinct().order_by('nama')
     if request.method == 'POST':
         for s in santri_asrama:
