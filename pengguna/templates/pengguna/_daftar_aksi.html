@@ -1,0 +1,12 @@
+{% if aksi_massal %}
+<div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+  <select name="aksi_massal" class="form-select form-select-sm" style="max-width:18rem">
+    <option value="">Aksi untuk baris terpilih…</option>
+    {% for val, label in aksi_massal %}
+      <option value="{{ val }}">{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-sm btn-outline-success" type="submit">Terapkan ke terpilih</button>
+  <span class="small text-muted">Centang baris, pilih aksi, lalu terapkan.</span>
+</div>
+{% endif %}

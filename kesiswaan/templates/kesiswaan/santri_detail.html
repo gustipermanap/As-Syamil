@@ -5,8 +5,14 @@
 <p>{{ santri.nomor_induk_santri }} · {{ santri.get_status_display }} · {{ santri.get_jenis_kelamin_display }}</p>
 <p><a class="btn btn-sm btn-outline-success" href="{% url 'kesiswaan:santri_ubah' santri.pk %}">Ubah</a>
    <a class="btn btn-sm btn-outline-secondary" href="{% url 'pengguna:rapor' santri.pk %}">Rapor</a></p>
-<p>Wali: {{ santri.wali|default:"—" }} · Kamar: {{ kamar.kamar|default:"—" }}</p>
+<p>Wali: {{ santri.wali|default:"—" }} · Kamar aktif: {{ kamar.kamar|default:"—" }}</p>
 <p class="small">NIK (internal): {{ santri.nik }}</p>
+<h2 class="h5">Riwayat kamar</h2>
+<ul>
+  {% for p in riwayat_kamar %}
+    <li>{{ p.kamar }} · masuk {{ p.masuk }}{% if p.keluar %} – keluar {{ p.keluar }}{% else %} (aktif){% endif %}</li>
+  {% empty %}<li>Belum ada penempatan.</li>{% endfor %}
+</ul>
 <h2 class="h5">Rombongan belajar</h2>
 <ul>{% for k in rb %}<li>{{ k.rb }}</li>{% empty %}<li>Belum masuk RB.</li>{% endfor %}</ul>
 <h2 class="h5">Pelanggaran (poin {{ poin }})</h2>

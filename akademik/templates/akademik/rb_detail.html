@@ -7,6 +7,28 @@
   <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_pengampu' rb.pk %}">Pengampu</a>
   <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_mapel' rb.pk %}">Pasang mapel</a>
 </p>
+{% if tahun_lain %}
+<form method="post" action="{% url 'akademik:rb_salin' rb.pk %}" class="card card-body mb-3">
+  {% csrf_token %}
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small mb-0">Salin struktur ke tahun ajaran</label>
+      <select class="form-select" name="tahun_ajaran">
+        {% for t in tahun_lain %}
+          <option value="{{ t.pk }}">{{ t.nama }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="salin_anggota" id="salin-anggota">
+        <label class="form-check-label" for="salin-anggota">Sertakan anggota</label>
+      </div>
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-success btn-sm" type="submit">Salin RB</button></div>
+  </div>
+</form>
+{% endif %}
 <h2 class="h5">Anggota</h2>
 <ul>{% for a in anggota %}<li>{{ a.santri }}</li>{% empty %}<li>Kosong.</li>{% endfor %}</ul>
 <h2 class="h5">Pengampu</h2>

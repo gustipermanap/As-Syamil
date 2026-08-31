@@ -2,14 +2,23 @@
 {% block title %}Rombongan belajar{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Rombongan belajar</h1>
-<p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
   <a class="btn btn-success btn-sm" href="{% url 'akademik:rb_baru' %}">RB baru</a>
   <a class="btn btn-outline-success btn-sm" href="{% url 'akademik:ruang_baru' %}">Ruang belajar</a>
   <a class="btn btn-outline-secondary btn-sm" href="{% url 'akademik:mapel' %}">Kitab / mapel</a>
 </p>
-<ul>
+<table class="table table-sm">
+  <thead><tr><th>Nama</th><th>Ruang</th><th>Tahun ajaran</th></tr></thead>
+  <tbody>
   {% for r in daftar %}
-    <li><a href="{% url 'akademik:rb_detail' r.pk %}">{{ r }}</a></li>
-  {% empty %}<li>Belum ada RB.</li>{% endfor %}
-</ul>
+    <tr>
+      <td><a href="{% url 'akademik:rb_detail' r.pk %}">{{ r }}</a></td>
+      <td>{{ r.ruang }}</td>
+      <td>{{ r.tahun_ajaran }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="3">Tidak ada RB sesuai filter.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% include "pengguna/_pagination.html" %}
 {% endblock %}

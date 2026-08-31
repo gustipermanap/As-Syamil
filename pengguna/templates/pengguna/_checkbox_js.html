@@ -1,0 +1,11 @@
+<script>
+(function () {
+  var semua = document.getElementById('pilih-semua');
+  if (!semua) return;
+  semua.addEventListener('change', function () {
+    document.querySelectorAll('input[name="pilih"]').forEach(function (el) {
+      el.checked = semua.checked;
+    });
+  });
+})();
+</script>

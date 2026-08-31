@@ -2,24 +2,37 @@
 {% block title %}Tagihan{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Tagihan / syahriyah</h1>
-<p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
   <a class="btn btn-success btn-sm" href="{% url 'keuangan:generate' %}">Generate massal</a>
   <a class="btn btn-outline-success btn-sm" href="{% url 'keuangan:jenis_baru' %}">Jenis tagihan</a>
-  <a class="btn btn-outline-secondary btn-sm" href="?status=belum">Belum</a>
 </p>
-<table class="table table-sm">
-  <thead><tr><th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Sisa</th><th>Status</th><th></th></tr></thead>
-  <tbody>
-  {% for t in daftar %}
-    <tr>
-      <td>{{ t.santri }}</td>
-      <td>{{ t.jenis }}</td>
-      <td>{{ t.jumlah }}</td>
-      <td>{{ t.sisa }}</td>
-      <td>{{ t.get_status_display }}</td>
-      <td>{% if t.status != 'lunas' and t.status != 'batal' %}<a href="{% url 'keuangan:bayar' t.pk %}">Terima bayar</a>{% endif %}</td>
-    </tr>
-  {% empty %}<tr><td colspan="6">Belum ada tagihan.</td></tr>{% endfor %}
-  </tbody>
-</table>
+<form method="post" action="{% if filter_qs %}?{{ filter_qs }}{% endif %}">
+  {% csrf_token %}
+  {% include "pengguna/_daftar_aksi.html" %}
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="pilih-semua"></th>
+        <th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Sisa</th><th>Jatuh tempo</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for t in daftar %}
+      <tr>
+        <td><input type="checkbox" name="pilih" value="{{ t.pk }}"></td>
+        <td>{{ t.santri }}</td>
+        <td>{{ t.jenis }}</td>
+        <td>{{ t.jumlah }}</td>
+        <td>{{ t.sisa }}</td>
+        <td>{{ t.jatuh_tempo }}</td>
+        <td>{{ t.get_status_display }}</td>
+        <td>{% if t.status != 'lunas' and t.status != 'batal' %}<a href="{% url 'keuangan:bayar' t.pk %}">Terima bayar</a>{% endif %}</td>
+      </tr>
+    {% empty %}<tr><td colspan="8">Tidak ada tagihan sesuai filter.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</form>
+{% include "pengguna/_pagination.html" %}
+{% include "pengguna/_checkbox_js.html" %}
 {% endblock %}

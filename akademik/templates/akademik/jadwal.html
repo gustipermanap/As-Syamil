@@ -2,7 +2,8 @@
 {% block title %}Jadwal{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Jadwal mingguan</h1>
-<p><a class="btn btn-success btn-sm" href="{% url 'akademik:jadwal_baru' %}">Slot baru</a></p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'akademik:jadwal_baru' %}">Slot baru</a></p>
 <table class="table table-sm">
   <thead><tr><th>Hari</th><th>Jam</th><th>RB</th><th>Mapel</th><th>Pengampu</th></tr></thead>
   <tbody>
@@ -14,7 +15,8 @@
       <td>{{ j.mapel }}</td>
       <td>{{ j.pengampu }}</td>
     </tr>
-  {% empty %}<tr><td colspan="5">Belum ada jadwal.</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="5">Tidak ada jadwal sesuai filter.</td></tr>{% endfor %}
   </tbody>
 </table>
+{% include "pengguna/_pagination.html" %}
 {% endblock %}

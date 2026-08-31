@@ -2,24 +2,37 @@
 {% block title %}Gelombang PPDB{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Gelombang PPDB</h1>
-<p><a class="btn btn-success btn-sm" href="{% url 'ppdb:gelombang_baru' %}">Gelombang baru</a></p>
-<table class="table table-sm">
-  <thead><tr><th>Nama</th><th>Mulai</th><th>Selesai</th><th>Kuota</th><th>Status</th><th></th></tr></thead>
-  <tbody>
-  {% for g in daftar %}
-    <tr>
-      <td>{{ g.nama }}</td>
-      <td>{{ g.mulai }}</td>
-      <td>{{ g.selesai }}</td>
-      <td>{{ g.kuota }}</td>
-      <td>{{ g.get_status_display }}</td>
-      <td>
-        <a href="{% url 'ppdb:gelombang_ubah' g.pk %}">Ubah</a> ·
-        <a href="{% url 'ppdb:gelombang_status' g.pk 'dibuka' %}">Buka</a> ·
-        <a href="{% url 'ppdb:gelombang_status' g.pk 'ditutup' %}">Tutup</a>
-      </td>
-    </tr>
-  {% empty %}<tr><td colspan="6">Belum ada gelombang.</td></tr>{% endfor %}
-  </tbody>
-</table>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'ppdb:gelombang_baru' %}">Gelombang baru</a></p>
+<form method="post" action="{% if filter_qs %}?{{ filter_qs }}{% endif %}">
+  {% csrf_token %}
+  {% include "pengguna/_daftar_aksi.html" %}
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="pilih-semua"></th>
+        <th>Nama</th><th>Mulai</th><th>Selesai</th><th>Kuota</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for g in daftar %}
+      <tr>
+        <td><input type="checkbox" name="pilih" value="{{ g.pk }}"></td>
+        <td>{{ g.nama }}</td>
+        <td>{{ g.mulai }}</td>
+        <td>{{ g.selesai }}</td>
+        <td>{{ g.jumlah_diterima }} / {{ g.kuota }}</td>
+        <td>{{ g.get_status_display }}</td>
+        <td>
+          <a href="{% url 'ppdb:gelombang_ubah' g.pk %}">Ubah</a> ·
+          <a href="{% url 'ppdb:gelombang_status' g.pk 'dibuka' %}">Buka</a> ·
+          <a href="{% url 'ppdb:gelombang_status' g.pk 'ditutup' %}">Tutup</a>
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="7">Tidak ada gelombang sesuai filter.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</form>
+{% include "pengguna/_pagination.html" %}
+{% include "pengguna/_checkbox_js.html" %}
 {% endblock %}

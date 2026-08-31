@@ -2,7 +2,11 @@
 {% block title %}Absensi{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Pertemuan dan absensi</h1>
-<p><a class="btn btn-success btn-sm" href="{% url 'akademik:pertemuan_baru' %}">Pertemuan baru</a></p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
+  <a class="btn btn-success btn-sm" href="{% url 'akademik:pertemuan_baru' %}">Pertemuan baru</a>
+  <a class="btn btn-outline-success btn-sm" href="{% url 'akademik:rekap_absensi' %}">Rekap absensi</a>
+</p>
 <table class="table table-sm">
   <thead><tr><th>Tanggal</th><th>RB</th><th>Mapel</th><th></th></tr></thead>
   <tbody>
@@ -13,7 +17,8 @@
       <td>{{ p.mapel }}</td>
       <td><a href="{% url 'akademik:isi_absensi' p.pk %}">Isi absensi</a></td>
     </tr>
-  {% empty %}<tr><td colspan="4">Belum ada pertemuan.</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="4">Tidak ada pertemuan sesuai filter.</td></tr>{% endfor %}
   </tbody>
 </table>
+{% include "pengguna/_pagination.html" %}
 {% endblock %}

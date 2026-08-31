@@ -2,9 +2,10 @@
 {% block title %}Nilai{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Penilaian</h1>
-<p><a class="btn btn-success btn-sm" href="{% url 'akademik:nilai_baru' %}">Input nilai</a></p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'akademik:nilai_baru' %}">Input nilai</a></p>
 <table class="table table-sm">
-  <thead><tr><th>Santri</th><th>Mapel</th><th>Nilai</th><th>Predikat</th><th>Periode</th></tr></thead>
+  <thead><tr><th>Santri</th><th>Mapel</th><th>Nilai</th><th>Predikat</th><th>Jenis</th><th>Periode</th></tr></thead>
   <tbody>
   {% for n in daftar %}
     <tr>
@@ -12,9 +13,11 @@
       <td>{{ n.mapel }}</td>
       <td>{{ n.nilai }}</td>
       <td>{{ n.predikat }}</td>
+      <td>{{ n.get_jenis_display }}</td>
       <td>{{ n.periode }}</td>
     </tr>
-  {% empty %}<tr><td colspan="5">Belum ada nilai.</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="6">Tidak ada nilai sesuai filter.</td></tr>{% endfor %}
   </tbody>
 </table>
+{% include "pengguna/_pagination.html" %}
 {% endblock %}

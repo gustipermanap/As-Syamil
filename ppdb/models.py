@@ -46,12 +46,26 @@ class GelombangPPDB(models.Model):
             self.save(update_fields=['status'])
         return self.status
 
+    def jumlah_diterima(self):
+        return self.pendaftar.filter(status='diterima').count()
+
+    def sisa_kuota(self):
+        sisa = self.kuota - self.jumlah_diterima()
+        return sisa if sisa > 0 else 0
+
+    def tutup_jika_kuota_penuh(self):
+        if self.status == self.DIBUKA and self.kuota and self.jumlah_diterima() >= self.kuota:
+            self.status = self.DITUTUP
+            self.save(update_fields=['status'])
+        return self.status
+
 
 def gelombang_terbuka():
     sekarang = timezone.now()
     for g in GelombangPPDB.objects.filter(status=GelombangPPDB.DIBUKA):
         g.tutup_jika_lewat(sekarang)
-        if g.efektif_dibuka(sekarang):
+        g.tutup_jika_kuota_penuh()
+        if g.efektif_dibuka(sekarang) and g.sisa_kuota() > 0:
             return g
     return None
 

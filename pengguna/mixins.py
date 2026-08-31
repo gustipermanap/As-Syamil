@@ -103,3 +103,15 @@ def butuh_wali(view):
             return respon_dilarang(request, 'Tidak berhak mengakses portal wali.')
         return view(request, *args, **kwargs)
     return inner
+
+
+def butuh_santri(view):
+    @login_required(login_url='/masuk/')
+    @wraps(view)
+    def inner(request, *args, **kwargs):
+        if not Pengaturan.get().portal_santri_aktif:
+            return respon_dilarang(request, 'Portal santri tidak aktif.')
+        if not (user_punya_grup(request.user, [GRUP_SANTRI]) or request.user.is_superuser):
+            return respon_dilarang(request, 'Tidak berhak mengakses portal santri.')
+        return view(request, *args, **kwargs)
+    return inner

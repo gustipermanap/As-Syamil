@@ -1,0 +1,28 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Rekap absensi{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Rekap absensi KBM</h1>
+<p class="text-muted">Ambang alpa beruntun: {{ ambang_alpa }} pertemuan. Santri yang mencapai ambang ditandai.</p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>Santri</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpa</th><th>Terlambat</th><th>Alpa beruntun</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for r in rekap %}
+    <tr{% if r.peringatan %} class="table-warning"{% endif %}>
+      <td><a href="{% url 'kesiswaan:santri_detail' r.santri.pk %}">{{ r.santri }}</a></td>
+      <td>{{ r.santri.n_hadir }}</td>
+      <td>{{ r.santri.n_izin }}</td>
+      <td>{{ r.santri.n_sakit }}</td>
+      <td>{{ r.santri.n_alpa }}</td>
+      <td>{{ r.santri.n_terlambat }}</td>
+      <td>{% if r.peringatan %}<strong>{{ r.beruntun }}</strong>{% else %}{{ r.beruntun }}{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="7">Tidak ada data sesuai filter.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% include "pengguna/_pagination.html" %}
+{% endblock %}

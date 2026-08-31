@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
+from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin
 from pengguna.models import GRUP_MUDIR, GRUP_TU
@@ -84,10 +85,40 @@ class UbahPengaturan(OperasiMixin, UpdateView):
         return super().form_valid(form)
 
 
-class DaftarUnit(OperasiMixin, ListView):
+class DaftarUnit(DaftarFilterMixin, OperasiMixin, ListView):
     model = UnitPendidikan
     template_name = 'lembaga/unit_list.html'
     context_object_name = 'daftar'
+    search_fields = ('nama', 'label_peserta')
+    exact_filters = {'tipe': 'tipe'}
+    boolean_filters = {'aktif': 'aktif'}
+    cari_placeholder = 'Nama unit'
+    export_filename = 'unit.xlsx'
+    export_columns = [
+        ('Nama', 'nama'),
+        ('Tipe', 'get_tipe_display'),
+        ('Aktif', 'aktif'),
+        ('Label peserta', 'label_peserta'),
+    ]
+    filter_fields = [
+        {'name': 'tipe', 'label': 'Tipe', 'choices': UnitPendidikan.TIPE_CHOICES},
+        {'name': 'aktif', 'label': 'Aktif', 'choices': [('1', 'Aktif'), ('0', 'Nonaktif')], 'advanced': True},
+    ]
+    aksi_massal_pilihan = [
+        ('aktifkan', 'Aktifkan'),
+        ('nonaktifkan', 'Nonaktifkan'),
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('jenjang').order_by('nama')
+
+    def bulk_aktifkan(self, ids):
+        n = UnitPendidikan.objects.filter(pk__in=ids).update(aktif=True)
+        messages.success(self.request, f'{n} unit diaktifkan.')
+
+    def bulk_nonaktifkan(self, ids):
+        n = UnitPendidikan.objects.filter(pk__in=ids).update(aktif=False)
+        messages.success(self.request, f'{n} unit dinonaktifkan.')
 
 
 class TambahUnit(OperasiMixin, CreateView):
@@ -120,10 +151,26 @@ class TambahJenjang(OperasiMixin, CreateView):
         return ctx
 
 
-class DaftarTahunAjaran(OperasiMixin, ListView):
+class DaftarTahunAjaran(DaftarFilterMixin, OperasiMixin, ListView):
     model = TahunAjaran
     template_name = 'lembaga/tahun_list.html'
     context_object_name = 'daftar'
+    search_fields = ('nama',)
+    boolean_filters = {'aktif': 'aktif'}
+    date_field = 'mulai'
+    export_filename = 'tahun_ajaran.xlsx'
+    export_columns = [
+        ('Nama', 'nama'),
+        ('Mulai', 'mulai'),
+        ('Selesai', 'selesai'),
+        ('Aktif', 'aktif'),
+    ]
+    filter_fields = [
+        {'name': 'aktif', 'label': 'Aktif', 'choices': [('1', 'Aktif'), ('0', 'Tidak')]},
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('periode').order_by('-mulai')
 
 
 class TambahTahunAjaran(OperasiMixin, CreateView):

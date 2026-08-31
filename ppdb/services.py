@@ -51,4 +51,8 @@ def terima_menjadi_santri(pendaftaran, prefix_nis='ASY', rb=None, kamar=None):
         from datetime import date
         if not PenempatanKamar.objects.filter(santri=santri, keluar__isnull=True).exists():
             PenempatanKamar.objects.create(santri=santri, kamar=kamar, masuk=date.today())
+    if pendaftaran.gelombang_id:
+        gelombang = GelombangPPDB.objects.filter(pk=pendaftaran.gelombang_id).first()
+        if gelombang:
+            gelombang.tutup_jika_kuota_penuh()
     return santri

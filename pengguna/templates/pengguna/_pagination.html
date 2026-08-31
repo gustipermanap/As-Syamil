@@ -1,0 +1,13 @@
+{% if is_paginated %}
+<nav class="d-flex align-items-center gap-2 mt-3" aria-label="Pagination">
+  {% if page_obj.has_previous %}
+    <a class="btn btn-sm btn-outline-secondary" href="?{{ filter_qs }}{% if filter_qs %}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Sebelumnya</a>
+  {% endif %}
+  <span class="small text-muted">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }} · {{ jumlah_filter }} data sesuai filter</span>
+  {% if page_obj.has_next %}
+    <a class="btn btn-sm btn-outline-secondary" href="?{{ filter_qs }}{% if filter_qs %}&amp;{% endif %}page={{ page_obj.next_page_number }}">Berikutnya</a>
+  {% endif %}
+</nav>
+{% elif jumlah_filter %}
+<p class="small text-muted mt-2">{{ jumlah_filter }} data sesuai filter</p>
+{% endif %}

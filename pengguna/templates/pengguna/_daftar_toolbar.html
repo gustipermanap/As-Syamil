@@ -1,0 +1,53 @@
+<form method="get" class="card card-body mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small mb-0">Cari</label>
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="{{ cari_placeholder|default:'Cari...' }}">
+    </div>
+    {% for f in filter_cepat %}
+    <div class="col-md-2">
+      <label class="form-label small mb-0">{{ f.label }}</label>
+      <select class="form-select" name="{{ f.name }}">
+        <option value="">Semua</option>
+        {% for o in f.options %}
+          <option value="{{ o.value }}"{% if o.selected %} selected{% endif %}>{{ o.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endfor %}
+    <div class="col-auto">
+      <button class="btn btn-success" type="submit">Terapkan</button>
+      <a class="btn btn-outline-secondary" href="{{ request.path }}">Reset</a>
+      <a class="btn btn-outline-success" href="?{{ filter_qs }}{% if filter_qs %}&amp;{% endif %}ekspor=xlsx">Ekspor Excel</a>
+    </div>
+  </div>
+  {% if tampilkan_tanggal or filter_lanjutan %}
+  <details class="mt-2"{% if filter_lanjutan_terbuka %} open{% endif %}>
+    <summary class="small text-muted">Filter lanjutan</summary>
+    <div class="row g-2 mt-1">
+      {% if tampilkan_tanggal %}
+      <div class="col-md-3">
+        <label class="form-label small mb-0">Dari tanggal</label>
+        <input class="form-control" type="date" name="dari" value="{{ request.GET.dari }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small mb-0">Sampai tanggal</label>
+        <input class="form-control" type="date" name="sampai" value="{{ request.GET.sampai }}">
+      </div>
+      {% endif %}
+      {% for f in filter_lanjutan %}
+      <div class="col-md-3">
+        <label class="form-label small mb-0">{{ f.label }}</label>
+        <select class="form-select" name="{{ f.name }}">
+          <option value="">Semua</option>
+          {% for o in f.options %}
+            <option value="{{ o.value }}"{% if o.selected %} selected{% endif %}>{{ o.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
+</form>
+<p class="small text-muted mb-2">Ekspor Excel memakai filter yang sedang aktif, bukan hanya halaman ini.</p>

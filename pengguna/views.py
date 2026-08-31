@@ -17,6 +17,7 @@ from lembaga.models import Pengaturan
 from ppdb.models import GelombangPPDB
 from tahfidz.models import ProgressHafalan, SetoranHafalan
 from WebApp.models import Pendaftaran
+from pengguna.daftar import DaftarFilterMixin
 from .forms_util import kelas_bootstrap
 from .mixins import OperasiMixin, SantriPortalMixin, WaliMixin, butuh_operasi
 from .models import GRUP_SANTRI, GRUP_TU, GRUP_WALI
@@ -132,12 +133,30 @@ def rapor_html(request, santri_id):
     })
 
 
-class DaftarPengguna(OperasiMixin, ListView):
+class DaftarPengguna(DaftarFilterMixin, OperasiMixin, ListView):
+    model = User
     template_name = 'pengguna/pengguna_list.html'
     context_object_name = 'daftar'
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    boolean_filters = {'aktif': 'is_active'}
+    cari_placeholder = 'Nama pengguna atau email'
+    export_filename = 'pengguna.xlsx'
+    export_columns = [
+        ('Username', 'username'),
+        ('Email', 'email'),
+        ('Aktif', 'is_active'),
+        ('Staf', 'is_staff'),
+    ]
+    filter_fields = [
+        {'name': 'aktif', 'label': 'Aktif', 'choices': [('1', 'Aktif'), ('0', 'Nonaktif')]},
+    ]
+    aksi_massal_pilihan = [
+        ('aktifkan', 'Aktifkan'),
+        ('nonaktifkan', 'Nonaktifkan'),
+    ]
 
     def get_queryset(self):
-        return User.objects.all().order_by('username')
+        return super().get_queryset().prefetch_related('groups').order_by('username')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and not (
@@ -145,6 +164,14 @@ class DaftarPengguna(OperasiMixin, ListView):
         ):
             return HttpResponseForbidden('Hanya Tata Usaha yang mengelola pengguna.')
         return super().dispatch(request, *args, **kwargs)
+
+    def bulk_aktifkan(self, ids):
+        n = User.objects.filter(pk__in=ids).update(is_active=True)
+        messages.success(self.request, f'{n} akun diaktifkan.')
+
+    def bulk_nonaktifkan(self, ids):
+        n = User.objects.filter(pk__in=ids).exclude(pk=self.request.user.pk).update(is_active=False)
+        messages.success(self.request, f'{n} akun dinonaktifkan.')
 
 
 @butuh_operasi

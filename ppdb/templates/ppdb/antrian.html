@@ -2,30 +2,43 @@
 {% block title %}Antrian PPDB{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Antrian PPDB</h1>
-<p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
   <a class="btn btn-success btn-sm" href="{% url 'ppdb:gelombang' %}">Gelombang</a>
-  <a class="btn btn-outline-secondary btn-sm" href="?status=dikirim">Dikirim</a>
-  <a class="btn btn-outline-secondary btn-sm" href="?">Semua</a>
 </p>
-<table class="table table-sm">
-  <thead><tr><th>Nama</th><th>Kode</th><th>Gelombang</th><th>Status</th><th>Aksi</th></tr></thead>
-  <tbody>
-  {% for p in daftar %}
-    <tr>
-      <td>{{ p.nama_lengkap }}</td>
-      <td>{{ p.kode_pendaftaran }}</td>
-      <td>{{ p.gelombang }}</td>
-      <td>{{ p.get_status_display }}</td>
-      <td>
-        <a href="{% url 'ppdb:ubah_status' p.pk 'verifikasi' %}">Verifikasi</a> ·
-        <a href="{% url 'ppdb:ubah_status' p.pk 'tes' %}">Tes</a> ·
-        <a href="{% url 'ppdb:jadikan' p.pk %}">Jadikan santri</a> ·
-        <a href="{% url 'ppdb:ubah_status' p.pk 'ditolak' %}">Tolak</a>
-      </td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="5">Belum ada pendaftar.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+<form method="post" action="{% if filter_qs %}?{{ filter_qs }}{% endif %}">
+  {% csrf_token %}
+  {% include "pengguna/_daftar_aksi.html" %}
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="pilih-semua"></th>
+        <th>Nama</th><th>Kode</th><th>Gelombang</th><th>Status</th><th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in daftar %}
+      <tr>
+        <td><input type="checkbox" name="pilih" value="{{ p.pk }}"></td>
+        <td>{{ p.nama_lengkap }}</td>
+        <td>{{ p.kode_pendaftaran }}</td>
+        <td>{{ p.gelombang }}</td>
+        <td>{{ p.get_status_display }}</td>
+        <td>
+          <a href="{% url 'ppdb:ubah_status' p.pk 'verifikasi' %}">Verifikasi</a> ·
+          <a href="{% url 'ppdb:ubah_status' p.pk 'berkas_kurang' %}">Berkas kurang</a> ·
+          <a href="{% url 'ppdb:ubah_status' p.pk 'tes' %}">Tes</a> ·
+          <a href="{% url 'ppdb:ubah_status' p.pk 'cadangan' %}">Cadangan</a> ·
+          <a href="{% url 'ppdb:jadikan' p.pk %}">Jadikan santri</a> ·
+          <a href="{% url 'ppdb:ubah_status' p.pk 'ditolak' %}">Tolak</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6">Tidak ada pendaftar sesuai filter.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% include "pengguna/_pagination.html" %}
+{% include "pengguna/_checkbox_js.html" %}
 {% endblock %}

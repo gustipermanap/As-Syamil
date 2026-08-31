@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
 
 from akademik.models import RombonganBelajar
+from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import KeuanganMixin, butuh_keuangan
 from .models import JenisTagihan, Pembayaran, Tagihan
@@ -18,23 +19,55 @@ class JenisForm(forms.ModelForm):
         fields = ['nama', 'deskripsi']
 
 
-class DaftarTagihan(KeuanganMixin, ListView):
+class DaftarTagihan(DaftarFilterMixin, KeuanganMixin, ListView):
     model = Tagihan
     template_name = 'keuangan/tagihan_list.html'
     context_object_name = 'daftar'
+    search_fields = ('santri__nama', 'santri__nomor_induk_santri', 'jenis__nama')
+    exact_filters = {'status': 'status', 'jenis': 'jenis_id'}
+    date_field = 'jatuh_tempo'
+    cari_placeholder = 'Santri, NIS, jenis tagihan'
+    export_filename = 'tagihan.xlsx'
+    export_columns = [
+        ('Santri', 'santri.nama'),
+        ('NIS', 'santri.nomor_induk_santri'),
+        ('Jenis', 'jenis.nama'),
+        ('Jumlah', 'jumlah'),
+        ('Sisa', 'sisa'),
+        ('Status', 'get_status_display'),
+        ('Jatuh tempo', 'jatuh_tempo'),
+        ('Periode', 'periode'),
+    ]
+    aksi_massal_pilihan = [
+        ('batal', 'Batalkan tagihan terpilih'),
+    ]
+
+    def get_filter_fields(self):
+        return [
+            {'name': 'status', 'label': 'Status', 'choices': Tagihan.STATUS},
+            {
+                'name': 'jenis',
+                'label': 'Jenis',
+                'choices': [(j.pk, j.nama) for j in JenisTagihan.objects.all()],
+                'advanced': True,
+            },
+        ]
 
     def get_queryset(self):
-        qs = Tagihan.objects.select_related('santri', 'jenis', 'periode').exclude(status='batal')
-        status = self.request.GET.get('status')
-        if status:
-            qs = qs.filter(status=status)
-        return qs.order_by('jatuh_tempo')
+        qs = Tagihan.objects.select_related('santri', 'jenis', 'periode').order_by('jatuh_tempo')
+        if not self.request.GET.get('status'):
+            qs = qs.exclude(status='batal')
+        return self.apply_filters(qs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['jenis'] = JenisTagihan.objects.all()
         ctx['tunggakan'] = Tagihan.objects.exclude(status__in=['lunas', 'batal'])
         return ctx
+
+    def bulk_batal(self, ids):
+        n = Tagihan.objects.filter(pk__in=ids).exclude(status='lunas').update(status='batal')
+        messages.success(self.request, f'{n} tagihan dibatalkan.')
 
 
 class TambahJenis(KeuanganMixin, CreateView):

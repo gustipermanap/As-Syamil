@@ -2,31 +2,35 @@
 {% block title %}Santri{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Santri</h1>
-<form class="row g-2 mb-3" method="get">
-  <div class="col-auto"><input class="form-control" name="q" placeholder="Cari nama" value="{{ request.GET.q }}"></div>
-  <div class="col-auto">
-    <select class="form-control" name="status">
-      <option value="">Semua status</option>
-      <option value="aktif">Aktif</option>
-      <option value="lulus">Lulus</option>
-      <option value="keluar">Keluar</option>
-    </select>
-  </div>
-  <div class="col-auto"><button class="btn btn-outline-success">Filter</button></div>
-  <div class="col-auto"><a class="btn btn-success" href="{% url 'kesiswaan:santri_baru' %}">Santri baru</a></div>
-  <div class="col-auto"><a class="btn btn-outline-secondary" href="{% url 'kesiswaan:wali_baru' %}">Wali baru</a></div>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
+  <a class="btn btn-success btn-sm" href="{% url 'kesiswaan:santri_baru' %}">Santri baru</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'kesiswaan:wali_baru' %}">Wali baru</a>
+</p>
+<form method="post" action="{% if filter_qs %}?{{ filter_qs }}{% endif %}">
+  {% csrf_token %}
+  {% include "pengguna/_daftar_aksi.html" %}
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="pilih-semua" aria-label="Pilih semua"></th>
+        <th>NIS</th><th>Nama</th><th>JK</th><th>Status</th><th>Wali</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for s in daftar %}
+      <tr>
+        <td><input type="checkbox" name="pilih" value="{{ s.pk }}"></td>
+        <td>{{ s.nomor_induk_santri }}</td>
+        <td><a href="{% url 'kesiswaan:santri_detail' s.pk %}">{{ s.nama }}</a></td>
+        <td>{{ s.get_jenis_kelamin_display }}</td>
+        <td>{{ s.get_status_display }}</td>
+        <td>{{ s.wali|default:"—" }}</td>
+      </tr>
+    {% empty %}<tr><td colspan="6">Tidak ada santri sesuai filter.</td></tr>{% endfor %}
+    </tbody>
+  </table>
 </form>
-<table class="table table-sm">
-  <thead><tr><th>NIS</th><th>Nama</th><th>Status</th><th>Wali</th></tr></thead>
-  <tbody>
-  {% for s in daftar %}
-    <tr>
-      <td>{{ s.nomor_induk_santri }}</td>
-      <td><a href="{% url 'kesiswaan:santri_detail' s.pk %}">{{ s.nama }}</a></td>
-      <td>{{ s.get_status_display }}</td>
-      <td>{{ s.wali|default:"—" }}</td>
-    </tr>
-  {% empty %}<tr><td colspan="4">Belum ada santri.</td></tr>{% endfor %}
-  </tbody>
-</table>
+{% include "pengguna/_pagination.html" %}
+{% include "pengguna/_checkbox_js.html" %}
 {% endblock %}

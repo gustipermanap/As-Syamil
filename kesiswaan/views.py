@@ -4,17 +4,16 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
-from pengguna.mixins import OperasiMixin, WaliMixin, butuh_operasi, butuh_wali
-from pengguna.models import GRUP_SANTRI, GRUP_WALI
+from pengguna.mixins import OperasiMixin, butuh_operasi, butuh_santri, butuh_wali
 from .models import (
     AbsensiAsrama, CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
     Pegawai, PenempatanKamar, Santri, WaliSantri,
 )
-from .services import anak_wali, pindah_kamar, proses_izin
+from .services import anak_wali, pindah_kamar, proses_izin, santri_portal
 
 
 class PegawaiForm(forms.ModelForm):
@@ -94,21 +93,53 @@ class JenisPelanggaranForm(forms.ModelForm):
         fields = ['nama', 'poin', 'kategori']
 
 
-class DaftarSantri(OperasiMixin, ListView):
+class DaftarSantri(DaftarFilterMixin, OperasiMixin, ListView):
     model = Santri
     template_name = 'kesiswaan/santri_list.html'
     context_object_name = 'daftar'
-    paginate_by = 50
+    search_fields = ('nama', 'nomor_induk_santri', 'nisn', 'nik')
+    exact_filters = {'status': 'status', 'jenis_kelamin': 'jenis_kelamin'}
+    date_field = 'tanggal_lahir'
+    cari_placeholder = 'Nama, NIS, NISN, NIK'
+    export_filename = 'santri.xlsx'
+    export_columns = [
+        ('NIS', 'nomor_induk_santri'),
+        ('Nama', 'nama'),
+        ('JK', 'get_jenis_kelamin_display'),
+        ('Status', 'get_status_display'),
+        ('Wali', 'wali.nama'),
+        ('Tanggal lahir', 'tanggal_lahir'),
+        ('NISN', 'nisn'),
+    ]
+    filter_fields = [
+        {'name': 'status', 'label': 'Status', 'choices': Santri.STATUS},
+        {'name': 'jenis_kelamin', 'label': 'Jenis kelamin', 'choices': Santri.JENIS_KELAMIN, 'advanced': True},
+    ]
+    aksi_massal_pilihan = [
+        ('aktif', 'Ubah status: Aktif'),
+        ('lulus', 'Ubah status: Lulus'),
+        ('keluar', 'Ubah status: Keluar'),
+        ('izin_panjang', 'Ubah status: Izin panjang'),
+    ]
 
     def get_queryset(self):
-        qs = Santri.objects.select_related('wali').order_by('nama')
-        status = self.request.GET.get('status')
-        q = self.request.GET.get('q')
-        if status:
-            qs = qs.filter(status=status)
-        if q:
-            qs = qs.filter(nama__icontains=q)
-        return qs
+        return super().get_queryset().select_related('wali').order_by('nama')
+
+    def _bulk_status(self, ids, status):
+        n = Santri.objects.filter(pk__in=ids).update(status=status)
+        messages.success(self.request, f'{n} santri diubah menjadi {status}.')
+
+    def bulk_aktif(self, ids):
+        self._bulk_status(ids, 'aktif')
+
+    def bulk_lulus(self, ids):
+        self._bulk_status(ids, 'lulus')
+
+    def bulk_keluar(self, ids):
+        self._bulk_status(ids, 'keluar')
+
+    def bulk_izin_panjang(self, ids):
+        self._bulk_status(ids, 'izin_panjang')
 
 
 class DetailSantri(OperasiMixin, DetailView):
@@ -121,6 +152,7 @@ class DetailSantri(OperasiMixin, DetailView):
         ctx['pelanggaran'] = self.object.pelanggaran.select_related('jenis')
         ctx['poin'] = sum(p.jenis.poin for p in ctx['pelanggaran'])
         ctx['kamar'] = self.object.penempatan_kamar.filter(keluar__isnull=True).select_related('kamar__gedung').first()
+        ctx['riwayat_kamar'] = self.object.penempatan_kamar.select_related('kamar__gedung').order_by('-masuk')
         ctx['rb'] = self.object.keanggotaan_rb.select_related('rb')
         return ctx
 
@@ -159,10 +191,49 @@ class TambahSantri(OperasiMixin, CreateView):
         return ctx
 
 
-class DaftarPegawai(OperasiMixin, ListView):
+class DaftarPegawai(DaftarFilterMixin, OperasiMixin, ListView):
     model = Pegawai
     template_name = 'kesiswaan/pegawai_list.html'
     context_object_name = 'daftar'
+    search_fields = ('nama', 'kontak', 'user__username')
+    boolean_filters = {'aktif': 'aktif'}
+    exact_filters = {'jenis_kelamin': 'jenis_kelamin'}
+    cari_placeholder = 'Nama, kontak, akun'
+    export_filename = 'pegawai.xlsx'
+    export_columns = [
+        ('Nama', 'nama'),
+        ('JK', 'get_jenis_kelamin_display'),
+        ('Aktif', 'aktif'),
+        ('Akun', 'user.username'),
+        ('Kontak', 'kontak'),
+    ]
+    filter_fields = [
+        {'name': 'aktif', 'label': 'Status', 'choices': [('1', 'Aktif'), ('0', 'Nonaktif')]},
+        {'name': 'jenis_kelamin', 'label': 'Jenis kelamin', 'choices': Pegawai.JENIS_KELAMIN, 'advanced': True},
+    ]
+    aksi_massal_pilihan = [
+        ('aktifkan', 'Aktifkan'),
+        ('nonaktifkan', 'Nonaktifkan'),
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('user').order_by('nama')
+
+    def bulk_aktifkan(self, ids):
+        n = 0
+        for p in Pegawai.objects.filter(pk__in=ids):
+            p.aktif = True
+            p.save()
+            n += 1
+        messages.success(self.request, f'{n} pegawai diaktifkan.')
+
+    def bulk_nonaktifkan(self, ids):
+        n = 0
+        for p in Pegawai.objects.filter(pk__in=ids):
+            p.aktif = False
+            p.save()
+            n += 1
+        messages.success(self.request, f'{n} pegawai dinonaktifkan.')
 
 
 class TambahPegawai(OperasiMixin, CreateView):
@@ -282,13 +353,49 @@ class TambahPenempatan(OperasiMixin, CreateView):
         return redirect(self.success_url)
 
 
-class DaftarIzin(OperasiMixin, ListView):
+class DaftarIzin(DaftarFilterMixin, OperasiMixin, ListView):
     model = Izin
     template_name = 'kesiswaan/izin_list.html'
     context_object_name = 'daftar'
+    search_fields = ('santri__nama', 'santri__nomor_induk_santri', 'alasan')
+    exact_filters = {'status': 'status', 'jenis': 'jenis'}
+    date_field = 'mulai'
+    cari_placeholder = 'Nama santri, NIS, alasan'
+    export_filename = 'izin.xlsx'
+    export_columns = [
+        ('Santri', 'santri.nama'),
+        ('NIS', 'santri.nomor_induk_santri'),
+        ('Jenis', 'get_jenis_display'),
+        ('Status', 'get_status_display'),
+        ('Mulai', 'mulai'),
+        ('Selesai', 'selesai'),
+        ('Alasan', 'alasan'),
+    ]
+    filter_fields = [
+        {'name': 'status', 'label': 'Status', 'choices': Izin.STATUS},
+        {'name': 'jenis', 'label': 'Jenis', 'choices': Izin.JENIS, 'advanced': True},
+    ]
+    aksi_massal_pilihan = [
+        ('setujui', 'Setujui'),
+        ('tolak', 'Tolak'),
+    ]
 
     def get_queryset(self):
-        return Izin.objects.select_related('santri').order_by('-mulai')
+        return super().get_queryset().select_related('santri').order_by('-mulai')
+
+    def bulk_setujui(self, ids):
+        n = 0
+        for izin in Izin.objects.filter(pk__in=ids, status='diajukan'):
+            proses_izin(izin, 'setujui')
+            n += 1
+        messages.success(self.request, f'{n} izin disetujui.')
+
+    def bulk_tolak(self, ids):
+        n = 0
+        for izin in Izin.objects.filter(pk__in=ids, status='diajukan'):
+            proses_izin(izin, 'tolak')
+            n += 1
+        messages.success(self.request, f'{n} izin ditolak.')
 
 
 class TambahIzin(OperasiMixin, CreateView):
@@ -322,13 +429,29 @@ def aksi_izin(request, pk, aksi):
     return redirect('kesiswaan:izin')
 
 
-class DaftarPelanggaran(OperasiMixin, ListView):
+class DaftarPelanggaran(DaftarFilterMixin, OperasiMixin, ListView):
     model = CatatanPelanggaran
     template_name = 'kesiswaan/pelanggaran_list.html'
     context_object_name = 'daftar'
+    search_fields = ('santri__nama', 'santri__nomor_induk_santri', 'jenis__nama', 'sanksi')
+    exact_filters = {'kategori': 'jenis__kategori'}
+    date_field = 'tanggal'
+    cari_placeholder = 'Santri, jenis, sanksi'
+    export_filename = 'pelanggaran.xlsx'
+    export_columns = [
+        ('Tanggal', 'tanggal'),
+        ('Santri', 'santri.nama'),
+        ('Jenis', 'jenis.nama'),
+        ('Kategori', 'jenis.get_kategori_display'),
+        ('Poin', 'jenis.poin'),
+        ('Sanksi', 'sanksi'),
+    ]
+    filter_fields = [
+        {'name': 'kategori', 'label': 'Kategori', 'choices': JenisPelanggaran._meta.get_field('kategori').choices},
+    ]
 
     def get_queryset(self):
-        return CatatanPelanggaran.objects.select_related('santri', 'jenis').order_by('-tanggal')
+        return super().get_queryset().select_related('santri', 'jenis').order_by('-tanggal')
 
 
 class TambahPelanggaran(OperasiMixin, CreateView):
@@ -359,6 +482,31 @@ class TambahJenisPelanggaran(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Jenis pelanggaran'
         return ctx
+
+
+@butuh_santri
+def izin_santri(request):
+    santri = santri_portal(request.user)
+    if not santri:
+        messages.error(request, 'Akun ini belum tertaut ke data santri.')
+        return redirect('pengguna:santri')
+    if request.method == 'POST':
+        form = kelas_bootstrap(IzinForm(request.POST))
+        form.fields.pop('santri')
+        if form.is_valid():
+            izin = form.save(commit=False)
+            izin.santri = santri
+            izin.pemohon = request.user
+            izin.save()
+            messages.success(request, 'Izin diajukan. Menunggu persetujuan pengasuhan.')
+            return redirect('pengguna:santri')
+    else:
+        form = kelas_bootstrap(IzinForm())
+        form.fields.pop('santri')
+    return render(request, 'pengguna/form_umum.html', {
+        'judul': f'Ajukan izin — {santri.nama}',
+        'form': form,
+    })
 
 
 @butuh_wali

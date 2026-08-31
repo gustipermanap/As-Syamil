@@ -7,6 +7,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 
 from akademik.models import RombonganBelajar
 from kesiswaan.models import Kamar
+from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin, butuh_operasi
 from pengguna.models import GRUP_TU
@@ -26,24 +27,107 @@ class GelombangForm(forms.ModelForm):
         }
 
 
-class AntrianPPDB(OperasiMixin, ListView):
+class AntrianPPDB(DaftarFilterMixin, OperasiMixin, ListView):
     model = Pendaftaran
     template_name = 'ppdb/antrian.html'
     context_object_name = 'daftar'
-    paginate_by = 50
+    search_fields = ('nama_lengkap', 'kode_pendaftaran', 'nisn', 'nama_ayah', 'nama_ibu')
+    exact_filters = {
+        'status': 'status',
+        'gelombang': 'gelombang_id',
+        'jenis_kelamin': 'jenis_kelamin',
+    }
+    date_field = 'created_at'
+    cari_placeholder = 'Nama, kode, NISN, orang tua'
+    export_filename = 'ppdb.xlsx'
+    export_columns = [
+        ('Kode', 'kode_pendaftaran'),
+        ('Nama', 'nama_lengkap'),
+        ('JK', 'get_jenis_kelamin_display'),
+        ('Gelombang', 'gelombang.nama'),
+        ('Status', 'get_status_display'),
+        ('Kota', 'kota_kabupaten'),
+        ('HP', 'no_handphone'),
+    ]
+    aksi_massal_pilihan = [
+        ('verifikasi', 'Ubah: Verifikasi'),
+        ('berkas_kurang', 'Ubah: Berkas kurang'),
+        ('tes', 'Ubah: Tes'),
+        ('cadangan', 'Ubah: Cadangan'),
+        ('ditolak', 'Ubah: Ditolak'),
+    ]
+
+    def get_filter_fields(self):
+        return [
+            {'name': 'status', 'label': 'Status', 'choices': Pendaftaran._meta.get_field('status').choices},
+            {
+                'name': 'gelombang',
+                'label': 'Gelombang',
+                'choices': [(g.pk, g.nama) for g in GelombangPPDB.objects.all()],
+                'advanced': True,
+            },
+            {
+                'name': 'jenis_kelamin',
+                'label': 'Jenis kelamin',
+                'choices': Pendaftaran.jenis_kelamin_choices,
+                'advanced': True,
+            },
+        ]
 
     def get_queryset(self):
-        qs = Pendaftaran.objects.select_related('gelombang').order_by('-id')
-        status = self.request.GET.get('status')
-        if status:
-            qs = qs.filter(status=status)
-        return qs
+        return super().get_queryset().select_related('gelombang').order_by('-id')
+
+    def _bulk_status(self, ids, status):
+        n = Pendaftaran.objects.filter(pk__in=ids).exclude(status='diterima').update(status=status)
+        messages.success(self.request, f'{n} pendaftar diubah menjadi {status}.')
+
+    def bulk_verifikasi(self, ids):
+        self._bulk_status(ids, 'verifikasi')
+
+    def bulk_berkas_kurang(self, ids):
+        self._bulk_status(ids, 'berkas_kurang')
+
+    def bulk_tes(self, ids):
+        self._bulk_status(ids, 'tes')
+
+    def bulk_cadangan(self, ids):
+        self._bulk_status(ids, 'cadangan')
+
+    def bulk_ditolak(self, ids):
+        self._bulk_status(ids, 'ditolak')
 
 
-class DaftarGelombang(OperasiMixin, ListView):
+class DaftarGelombang(DaftarFilterMixin, OperasiMixin, ListView):
     model = GelombangPPDB
     template_name = 'ppdb/gelombang.html'
     context_object_name = 'daftar'
+    search_fields = ('nama',)
+    exact_filters = {'status': 'status'}
+    date_field = 'mulai'
+    export_filename = 'gelombang_ppdb.xlsx'
+    export_columns = [
+        ('Nama', 'nama'),
+        ('Mulai', 'mulai'),
+        ('Selesai', 'selesai'),
+        ('Kuota', 'kuota'),
+        ('Diterima', 'jumlah_diterima'),
+        ('Status', 'get_status_display'),
+    ]
+    filter_fields = [
+        {'name': 'status', 'label': 'Status', 'choices': GelombangPPDB.STATUS},
+    ]
+    aksi_massal_pilihan = [
+        ('buka', 'Buka gelombang'),
+        ('tutup', 'Tutup gelombang'),
+    ]
+
+    def bulk_buka(self, ids):
+        n = GelombangPPDB.objects.filter(pk__in=ids).update(status=GelombangPPDB.DIBUKA)
+        messages.success(self.request, f'{n} gelombang dibuka.')
+
+    def bulk_tutup(self, ids):
+        n = GelombangPPDB.objects.filter(pk__in=ids).update(status=GelombangPPDB.DITUTUP)
+        messages.success(self.request, f'{n} gelombang ditutup.')
 
 
 class TambahGelombang(OperasiMixin, CreateView):
@@ -83,8 +167,20 @@ def ubah_status(request, pk, status):
     ):
         return HttpResponseForbidden('Hanya Tata Usaha yang mengubah status PPDB.')
     pendaftar = get_object_or_404(Pendaftaran, pk=pk)
+    if status == 'diterima' and pendaftar.gelombang_id:
+        gelombang = pendaftar.gelombang
+        if gelombang and gelombang.sisa_kuota() <= 0 and pendaftar.status != 'diterima':
+            pendaftar.status = 'cadangan'
+            pendaftar.save(update_fields=['status'])
+            messages.warning(
+                request,
+                f'Kuota {gelombang.nama} penuh. {pendaftar.nama_lengkap} masuk cadangan.',
+            )
+            return redirect('ppdb:antrian')
     pendaftar.status = status
     pendaftar.save(update_fields=['status'])
+    if pendaftar.gelombang_id:
+        pendaftar.gelombang.tutup_jika_kuota_penuh()
     if status == 'diterima':
         return redirect('ppdb:jadikan', pk=pk)
     messages.success(request, f'Status {pendaftar.nama_lengkap} diubah.')
@@ -99,15 +195,18 @@ def jadikan_santri(request, pk):
     ):
         return HttpResponseForbidden('Hanya Tata Usaha yang menjadikan santri.')
     pendaftar = get_object_or_404(Pendaftaran, pk=pk)
+    rb_qs = RombonganBelajar.objects.select_related('ruang', 'tahun_ajaran')
+    if pendaftar.gelombang_id and pendaftar.gelombang.unit_tujuan_id:
+        rb_qs = rb_qs.filter(ruang__unit_id=pendaftar.gelombang.unit_tujuan_id)
     if request.method == 'POST':
-        rb = RombonganBelajar.objects.filter(pk=request.POST.get('rb') or 0).first()
+        rb = rb_qs.filter(pk=request.POST.get('rb') or 0).first()
         kamar = Kamar.objects.filter(pk=request.POST.get('kamar') or 0).first()
         santri = terima_menjadi_santri(pendaftar, rb=rb, kamar=kamar)
         messages.success(request, f'{pendaftar.nama_lengkap} menjadi santri {santri.nomor_induk_santri}.')
         return redirect('ppdb:antrian')
     return render(request, 'ppdb/jadikan.html', {
         'pendaftar': pendaftar,
-        'rb': RombonganBelajar.objects.select_related('ruang', 'tahun_ajaran'),
+        'rb': rb_qs,
         'kamar': Kamar.objects.select_related('gedung'),
     })
 

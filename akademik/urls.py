@@ -21,4 +21,6 @@ urlpatterns = [
     path('operasi/absensi/<int:pk>/', views.isi_absensi, name='isi_absensi'),
     path('operasi/nilai/', views.DaftarNilai.as_view(), name='nilai'),
     path('operasi/nilai/baru/', views.TambahNilai.as_view(), name='nilai_baru'),
+    path('operasi/rekap-absensi/', views.RekapAbsensi.as_view(), name='rekap_absensi'),
+    path('operasi/rb/<int:pk>/salin/', views.salin_rb_view, name='rb_salin'),
 ]

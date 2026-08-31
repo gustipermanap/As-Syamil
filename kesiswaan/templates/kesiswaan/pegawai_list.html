@@ -2,18 +2,32 @@
 {% block title %}Pegawai{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Pegawai</h1>
-<p><a class="btn btn-success btn-sm" href="{% url 'kesiswaan:pegawai_baru' %}">Pegawai baru</a></p>
-<table class="table table-sm">
-  <thead><tr><th>Nama</th><th>Aktif</th><th>Akun</th><th></th></tr></thead>
-  <tbody>
-  {% for p in daftar %}
-    <tr>
-      <td>{{ p.nama }}</td>
-      <td>{{ p.aktif|yesno:"Ya,Tidak" }}</td>
-      <td>{{ p.user|default:"—" }}</td>
-      <td><a href="{% url 'kesiswaan:pegawai_status' p.pk %}">Ubah status</a></td>
-    </tr>
-  {% empty %}<tr><td colspan="4">Belum ada pegawai.</td></tr>{% endfor %}
-  </tbody>
-</table>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'kesiswaan:pegawai_baru' %}">Pegawai baru</a></p>
+<form method="post" action="{% if filter_qs %}?{{ filter_qs }}{% endif %}">
+  {% csrf_token %}
+  {% include "pengguna/_daftar_aksi.html" %}
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="pilih-semua"></th>
+        <th>Nama</th><th>JK</th><th>Aktif</th><th>Akun</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in daftar %}
+      <tr>
+        <td><input type="checkbox" name="pilih" value="{{ p.pk }}"></td>
+        <td>{{ p.nama }}</td>
+        <td>{{ p.get_jenis_kelamin_display }}</td>
+        <td>{{ p.aktif|yesno:"Ya,Tidak" }}</td>
+        <td>{{ p.user|default:"—" }}</td>
+        <td><a href="{% url 'kesiswaan:pegawai_status' p.pk %}">Ubah status</a></td>
+      </tr>
+    {% empty %}<tr><td colspan="6">Tidak ada pegawai sesuai filter.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</form>
+{% include "pengguna/_pagination.html" %}
+{% include "pengguna/_checkbox_js.html" %}
 {% endblock %}

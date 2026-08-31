@@ -2,7 +2,8 @@
 {% block title %}Tahun ajaran{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Tahun ajaran dan periode</h1>
-<p>
+{% include "pengguna/_daftar_toolbar.html" %}
+<p class="mb-3">
   <a class="btn btn-success btn-sm" href="{% url 'lembaga:tahun_baru' %}">Tahun ajaran baru</a>
   <a class="btn btn-outline-success btn-sm" href="{% url 'lembaga:periode_baru' %}">Periode baru</a>
 </p>
@@ -15,5 +16,6 @@
       {% empty %}<li>Belum ada periode.</li>{% endfor %}
     </ul>
   </div>
-{% empty %}<p>Belum ada tahun ajaran.</p>{% endfor %}
+{% empty %}<p>Tidak ada tahun ajaran sesuai filter.</p>{% endfor %}
+{% include "pengguna/_pagination.html" %}
 {% endblock %}
