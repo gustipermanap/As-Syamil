@@ -73,6 +73,28 @@ class PPDBTests(TestCase):
         lagi = terima_menjadi_santri(p)
         self.assertEqual(lagi.pk, santri.pk)
 
+    def test_jadikan_santri_dengan_rb(self):
+        from akademik.models import KeanggotaanRB
+        data = data_dasar()
+        _gelombang()
+        self.client.post(reverse('pendaftaran'), _ppdb_payload(nama_lengkap='Calon RB'))
+        p = Pendaftaran.objects.get(nama_lengkap='Calon RB')
+        self.client.login(username='tu_ppdb', password='sandi123')
+        r = self.client.post(reverse('ppdb:jadikan', args=[p.pk]), {'rb': data['rb'].pk})
+        self.assertEqual(r.status_code, 302)
+        santri = Santri.objects.get(pendaftaran=p)
+        self.assertTrue(KeanggotaanRB.objects.filter(santri=santri, rb=data['rb']).exists())
+
+    def test_buka_tutup_gelombang(self):
+        g = _gelombang(status=GelombangPPDB.DRAF)
+        self.client.login(username='tu_ppdb', password='sandi123')
+        self.client.get(reverse('ppdb:gelombang_status', args=[g.pk, 'dibuka']))
+        g.refresh_from_db()
+        self.assertEqual(g.status, GelombangPPDB.DIBUKA)
+        self.client.get(reverse('ppdb:gelombang_status', args=[g.pk, 'ditutup']))
+        g.refresh_from_db()
+        self.assertEqual(g.status, GelombangPPDB.DITUTUP)
+
     def test_halaman_publik_tanpa_nik_tersimpan(self):
         _gelombang()
         self.client.post(reverse('pendaftaran'), _ppdb_payload())

@@ -216,3 +216,32 @@ class CatatanPelanggaran(models.Model):
 
     def __str__(self):
         return f'{self.santri} — {self.jenis}'
+
+
+class AbsensiAsrama(models.Model):
+    SESI = [
+        ('malam', 'Malam'),
+        ('shalat', 'Shalat'),
+        ('pagi', 'Pagi'),
+    ]
+    STATUS = [
+        ('hadir', 'Hadir'),
+        ('izin', 'Izin'),
+        ('sakit', 'Sakit'),
+        ('alpa', 'Alpa'),
+        ('terlambat', 'Terlambat'),
+    ]
+    santri = models.ForeignKey(Santri, on_delete=models.CASCADE, related_name='absensi_asrama')
+    tanggal = models.DateField()
+    sesi = models.CharField(max_length=20, choices=SESI, default='malam')
+    status = models.CharField(max_length=20, choices=STATUS, default='hadir')
+    petugas = models.ForeignKey(Pegawai, on_delete=models.SET_NULL, null=True, blank=True)
+    catatan = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        verbose_name = 'Absensi asrama'
+        verbose_name_plural = 'Absensi asrama'
+        unique_together = ('santri', 'tanggal', 'sesi')
+
+    def __str__(self):
+        return f'{self.santri} {self.tanggal} {self.sesi}'

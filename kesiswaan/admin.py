@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
+    AbsensiAsrama, CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
     Pegawai, PenempatanKamar, Santri, WaliSantri,
 )
 
@@ -13,3 +13,4 @@ admin.site.register(PenempatanKamar)
 admin.site.register(Izin)
 admin.site.register(JenisPelanggaran)
 admin.site.register(CatatanPelanggaran)
+admin.site.register(AbsensiAsrama)

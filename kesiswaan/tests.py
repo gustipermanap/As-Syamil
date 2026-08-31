@@ -110,3 +110,22 @@ class KesiswaanTests(TestCase):
         d = self.client.get(reverse('kesiswaan:santri_detail', args=[self.s1.pk]))
         self.assertEqual(d.status_code, 200)
         self.assertContains(d, 'Santri A')
+
+    def test_absensi_asrama_dan_pindah_kamar(self):
+        from kesiswaan.models import AbsensiAsrama
+        from kesiswaan.services import pindah_kamar
+        gedung = Gedung.objects.create(nama='Putra 2', putra_putri='L')
+        kamar1 = Kamar.objects.create(gedung=gedung, nama='A', kapasitas=4)
+        kamar2 = Kamar.objects.create(gedung=gedung, nama='B', kapasitas=4)
+        PenempatanKamar.objects.create(santri=self.s1, kamar=kamar1, masuk=date.today())
+        self.client.login(username='tu_kes', password='sandi123')
+        r = self.client.post(reverse('kesiswaan:absensi_asrama'), {
+            'tanggal': date.today().isoformat(),
+            'sesi': 'malam',
+            f'status_{self.s1.pk}': 'hadir',
+        })
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(AbsensiAsrama.objects.get(santri=self.s1).status, 'hadir')
+        baru = pindah_kamar(self.s1, kamar2, date.today())
+        self.assertEqual(baru.kamar, kamar2)
+        self.assertEqual(PenempatanKamar.objects.filter(santri=self.s1, keluar__isnull=True).count(), 1)

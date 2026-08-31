@@ -24,4 +24,6 @@ urlpatterns = [
     path('operasi/pelanggaran/baru/', views.TambahPelanggaran.as_view(), name='pelanggaran_baru'),
     path('operasi/pelanggaran/jenis/baru/', views.TambahJenisPelanggaran.as_view(), name='jenis_pelanggaran_baru'),
     path('wali/izin/', views.izin_wali, name='izin_wali'),
+    path('operasi/asrama/absensi/', views.absensi_asrama, name='absensi_asrama'),
+    path('operasi/asrama/pindah/', views.pindah_kamar_view, name='pindah_kamar'),
 ]

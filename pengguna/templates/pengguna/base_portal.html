@@ -27,7 +27,10 @@
           <li class="nav-item"><a class="nav-link" href="{% url 'akademik:nilai' %}">Nilai</a></li>
         {% endif %}
         {% if menu.tahfidz %}<li class="nav-item"><a class="nav-link" href="{% url 'tahfidz:setoran' %}">Setoran</a></li>{% endif %}
-        {% if menu.asrama %}<li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:asrama' %}">Asrama</a></li>{% endif %}
+        {% if menu.asrama %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:asrama' %}">Asrama</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:absensi_asrama' %}">Absensi asrama</a></li>
+        {% endif %}
         <li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:izin' %}">Izin</a></li>
         {% if menu.kedisiplinan %}<li class="nav-item"><a class="nav-link" href="{% url 'kesiswaan:pelanggaran' %}">Pelanggaran</a></li>{% endif %}
         {% if menu.boleh_keuangan %}<li class="nav-item"><a class="nav-link" href="{% url 'keuangan:tagihan' %}">Syahriyah</a></li>{% endif %}

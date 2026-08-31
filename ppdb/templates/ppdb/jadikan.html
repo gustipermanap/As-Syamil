@@ -1,0 +1,23 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Jadikan santri{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Jadikan santri</h1>
+<p>{{ pendaftar.nama_lengkap }} · {{ pendaftar.kode_pendaftaran }}</p>
+<form method="post">{% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Rombongan belajar awal (opsional)</label>
+    <select class="form-control" name="rb">
+      <option value="">—</option>
+      {% for r in rb %}<option value="{{ r.pk }}">{{ r }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Kamar (opsional, jika asrama)</label>
+    <select class="form-control" name="kamar">
+      <option value="">—</option>
+      {% for k in kamar %}<option value="{{ k.pk }}">{{ k }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-success" type="submit">Terbitkan NIS dan simpan</button>
+</form>
+{% endblock %}

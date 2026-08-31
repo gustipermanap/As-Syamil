@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -11,10 +11,10 @@ from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin, WaliMixin, butuh_operasi, butuh_wali
 from pengguna.models import GRUP_SANTRI, GRUP_WALI
 from .models import (
-    CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
+    AbsensiAsrama, CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
     Pegawai, PenempatanKamar, Santri, WaliSantri,
 )
-from .services import anak_wali, proses_izin, santri_portal
+from .services import anak_wali, pindah_kamar, proses_izin
 
 
 class PegawaiForm(forms.ModelForm):
@@ -377,3 +377,65 @@ def izin_wali(request):
         form = kelas_bootstrap(IzinForm())
         form.fields['santri'].queryset = anak
     return render(request, 'pengguna/form_umum.html', {'judul': 'Ajukan izin anak', 'form': form})
+
+
+@butuh_operasi
+def absensi_asrama(request):
+    from datetime import date
+    tanggal = request.POST.get('tanggal') or request.GET.get('tanggal') or date.today().isoformat()
+    sesi = request.POST.get('sesi') or request.GET.get('sesi') or 'malam'
+    santri_asrama = Santri.objects.filter(
+        status='aktif', penempatan_kamar__keluar__isnull=True,
+    ).distinct().order_by('nama')
+    if request.method == 'POST':
+        for s in santri_asrama:
+            status = request.POST.get(f'status_{s.pk}', 'hadir')
+            AbsensiAsrama.objects.update_or_create(
+                santri=s, tanggal=tanggal, sesi=sesi,
+                defaults={'status': status, 'petugas': getattr(request.user, 'pegawai', None)},
+            )
+        messages.success(request, 'Absensi asrama disimpan.')
+        return redirect(f"{reverse('kesiswaan:absensi_asrama')}?tanggal={tanggal}&sesi={sesi}")
+    tersimpan = {
+        a.santri_id: a.status
+        for a in AbsensiAsrama.objects.filter(tanggal=tanggal, sesi=sesi)
+    }
+    baris = [{'santri': s, 'status': tersimpan.get(s.pk, 'hadir')} for s in santri_asrama]
+    return render(request, 'kesiswaan/absensi_asrama.html', {
+        'tanggal': tanggal,
+        'sesi': sesi,
+        'baris': baris,
+        'pilihan': AbsensiAsrama.STATUS,
+        'sesi_pilihan': AbsensiAsrama.SESI,
+    })
+
+
+@butuh_operasi
+def pindah_kamar_view(request):
+    from datetime import date
+    if request.method == 'POST':
+        santri = get_object_or_404(Santri, pk=request.POST.get('santri'))
+        kamar = get_object_or_404(Kamar, pk=request.POST.get('kamar'))
+        try:
+            pindah_kamar(santri, kamar, date.today())
+            messages.success(request, f'{santri.nama} dipindah ke {kamar}.')
+            return redirect('kesiswaan:asrama')
+        except ValidationError as exc:
+            messages.error(request, ' '.join(exc.messages) if hasattr(exc, 'messages') else str(exc))
+    return render(request, 'pengguna/form_umum.html', {
+        'judul': 'Pindah kamar',
+        'form_html': (
+            '<div class="mb-3"><label class="form-label">Santri</label>'
+            '<select class="form-control" name="santri">'
+            + ''.join(
+                f'<option value="{s.pk}">{s.nama}</option>'
+                for s in Santri.objects.filter(status='aktif')
+            )
+            + '</select></div>'
+            '<div class="mb-3"><label class="form-label">Kamar baru</label>'
+            '<select class="form-control" name="kamar">'
+            + ''.join(f'<option value="{k.pk}">{k}</option>' for k in Kamar.objects.select_related('gedung'))
+            + '</select></div>'
+        ),
+        'submit_label': 'Pindahkan',
+    })

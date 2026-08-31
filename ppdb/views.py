@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
+from akademik.models import RombonganBelajar
+from kesiswaan.models import Kamar
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin, butuh_operasi
 from pengguna.models import GRUP_TU
@@ -84,11 +86,44 @@ def ubah_status(request, pk, status):
     pendaftar.status = status
     pendaftar.save(update_fields=['status'])
     if status == 'diterima':
-        santri = terima_menjadi_santri(pendaftar)
-        messages.success(request, f'{pendaftar.nama_lengkap} menjadi santri {santri.nomor_induk_santri}.')
-    else:
-        messages.success(request, f'Status {pendaftar.nama_lengkap} diubah.')
+        return redirect('ppdb:jadikan', pk=pk)
+    messages.success(request, f'Status {pendaftar.nama_lengkap} diubah.')
     return redirect('ppdb:antrian')
+
+
+@butuh_operasi
+def jadikan_santri(request, pk):
+    if not (
+        request.user.is_superuser
+        or user_punya_grup(request.user, [GRUP_TU, 'mudir'])
+    ):
+        return HttpResponseForbidden('Hanya Tata Usaha yang menjadikan santri.')
+    pendaftar = get_object_or_404(Pendaftaran, pk=pk)
+    if request.method == 'POST':
+        rb = RombonganBelajar.objects.filter(pk=request.POST.get('rb') or 0).first()
+        kamar = Kamar.objects.filter(pk=request.POST.get('kamar') or 0).first()
+        santri = terima_menjadi_santri(pendaftar, rb=rb, kamar=kamar)
+        messages.success(request, f'{pendaftar.nama_lengkap} menjadi santri {santri.nomor_induk_santri}.')
+        return redirect('ppdb:antrian')
+    return render(request, 'ppdb/jadikan.html', {
+        'pendaftar': pendaftar,
+        'rb': RombonganBelajar.objects.select_related('ruang', 'tahun_ajaran'),
+        'kamar': Kamar.objects.select_related('gedung'),
+    })
+
+
+@butuh_operasi
+def status_gelombang(request, pk, status):
+    if not (
+        request.user.is_superuser
+        or user_punya_grup(request.user, [GRUP_TU, 'mudir'])
+    ):
+        return HttpResponseForbidden('Hanya Tata Usaha yang mengubah gelombang.')
+    gelombang = get_object_or_404(GelombangPPDB, pk=pk)
+    gelombang.status = status
+    gelombang.save(update_fields=['status'])
+    messages.success(request, f'{gelombang.nama} sekarang {gelombang.get_status_display()}.')
+    return redirect('ppdb:gelombang')
 
 
 def cek_status(request):

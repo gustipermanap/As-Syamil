@@ -10,7 +10,7 @@ from akademik.models import (
     Penilaian, PengampuRB, Pertemuan, RombonganBelajar, RuangBelajar,
 )
 from kesiswaan.models import (
-    CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
+    AbsensiAsrama, CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
     Pegawai, PenempatanKamar, Santri, WaliSantri,
 )
 from keuangan.models import JenisTagihan, Tagihan
@@ -194,6 +194,9 @@ class Command(BaseCommand):
         )
         PenempatanKamar.objects.get_or_create(
             santri=santri_objs[3], kamar=kamar_p, keluar=None, defaults={'masuk': hari},
+        )
+        AbsensiAsrama.objects.get_or_create(
+            santri=santri_objs[0], tanggal=hari, sesi='malam', defaults={'status': 'hadir'},
         )
 
         now = timezone.now()

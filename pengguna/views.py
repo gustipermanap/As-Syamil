@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, TemplateView, UpdateView
 
-from akademik.models import Absensi, Penilaian
-from kesiswaan.models import Santri
+from akademik.models import Absensi, JadwalSlot, Penilaian
+from kesiswaan.models import AbsensiAsrama, Izin, PenempatanKamar, Santri
 from kesiswaan.services import anak_wali, santri_portal
 from keuangan.models import Tagihan
 from lembaga.models import Pengaturan
@@ -62,6 +62,14 @@ class OperasiDasbor(OperasiMixin, TemplateView):
         ctx['tunggakan'] = Tagihan.objects.exclude(status='lunas').exclude(status='batal').count()
         ctx['alpa'] = Absensi.objects.filter(status='alpa').count()
         ctx['hadir_hari_ini'] = Absensi.objects.filter(pertemuan__tanggal=hari, status='hadir').count()
+        ctx['hadir_asrama_hari_ini'] = AbsensiAsrama.objects.filter(tanggal=hari, status='hadir').count()
+        pegawai = getattr(self.request.user, 'pegawai', None)
+        if pegawai:
+            ctx['jadwal_hari_ini'] = JadwalSlot.objects.filter(
+                pengampu=pegawai, hari=hari.weekday(),
+            ).select_related('rb', 'mapel')
+        else:
+            ctx['jadwal_hari_ini'] = JadwalSlot.objects.none()
         return ctx
 
 
@@ -71,12 +79,19 @@ class WaliDasbor(WaliMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         anak = anak_wali(self.request.user)
+        ringkas = []
+        for s in anak:
+            ringkas.append({
+                'santri': s,
+                'kamar': PenempatanKamar.objects.filter(santri=s, keluar__isnull=True).select_related('kamar__gedung').first(),
+                'rb': list(s.keanggotaan_rb.select_related('rb')),
+                'absensi': Absensi.objects.filter(santri=s).select_related('pertemuan').order_by('-pertemuan__tanggal')[:5],
+            })
         ctx['anak'] = anak
+        ctx['ringkas'] = ringkas
         ctx['tagihan'] = Tagihan.objects.filter(santri__in=anak).exclude(status='batal')
         ctx['nilai'] = Penilaian.objects.filter(santri__in=anak).order_by('-id')[:20]
-        ctx['izin'] = __import__('kesiswaan.models', fromlist=['Izin']).Izin.objects.filter(
-            santri__in=anak,
-        ).order_by('-mulai')[:10]
+        ctx['izin'] = Izin.objects.filter(santri__in=anak).order_by('-mulai')[:10]
         ctx['setoran'] = SetoranHafalan.objects.filter(santri__in=anak).order_by('-tanggal')[:10]
         return ctx
 

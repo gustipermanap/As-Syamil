@@ -9,6 +9,12 @@
     <li>{{ p.santri }} — {{ p.juz_selesai }} juz, halaman {{ p.halaman_berjalan }}</li>
   {% empty %}<li>Belum ada progress.</li>{% endfor %}
 </ul>
+<h2 class="h5">Setoran 7 hari terakhir</h2>
+<ul>
+  {% for s in setoran_minggu %}
+    <li>{{ s.santri__nama }} — {{ s.jumlah }} setoran</li>
+  {% empty %}<li>Belum ada setoran minggu ini.</li>{% endfor %}
+</ul>
 <h2 class="h5">Riwayat</h2>
 <table class="table table-sm">
   <thead><tr><th>Tanggal</th><th>Santri</th><th>Jenis</th><th>Mutu</th><th>Juz</th></tr></thead>
