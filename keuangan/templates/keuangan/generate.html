@@ -8,6 +8,7 @@
     <select class="form-control" name="jenis" required>
       {% for j in jenis %}<option value="{{ j.pk }}">{{ j.nama }}</option>{% endfor %}
     </select>
+    <p class="small mt-1">{% for j in jenis %}<a href="{% url 'keuangan:jenis_ubah' j.pk %}">Ubah {{ j.nama }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}</p>
   </div>
   <div class="mb-3"><label class="form-label">Jumlah</label><input class="form-control" name="jumlah" type="number" step="0.01" required></div>
   <div class="mb-3"><label class="form-label">Jatuh tempo</label><input class="form-control" name="jatuh_tempo" type="date" required></div>

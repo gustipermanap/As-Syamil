@@ -31,6 +31,7 @@ class Tagihan(models.Model):
     jenis = models.ForeignKey(JenisTagihan, on_delete=models.PROTECT)
     periode = models.ForeignKey('lembaga.Periode', on_delete=models.CASCADE, null=True, blank=True)
     jumlah = models.DecimalField(max_digits=12, decimal_places=2)
+    potongan = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     jatuh_tempo = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS, default=BELUM)
 
@@ -46,16 +47,33 @@ class Tagihan(models.Model):
         from django.db.models import Sum
         return self.pembayaran.aggregate(s=Sum('jumlah'))['s'] or 0
 
+    def jumlah_netto(self):
+        from decimal import Decimal
+        potongan = self.potongan or Decimal('0')
+        nilai = self.jumlah - potongan
+        return nilai if nilai > 0 else Decimal('0')
+
     def sisa(self):
-        return self.jumlah - self.terbayar()
+        return self.jumlah_netto() - self.terbayar()
+
+    def clean(self):
+        from decimal import Decimal
+        potongan = self.potongan or Decimal('0')
+        if potongan < 0:
+            raise ValidationError({'potongan': 'Potongan tidak boleh negatif.'})
+        if potongan > self.jumlah:
+            raise ValidationError({'potongan': 'Potongan tidak boleh melebihi jumlah tagihan.'})
 
     def refresh_status(self):
         if self.status == self.BATAL:
             return
         terbayar = self.terbayar()
-        if terbayar <= 0:
+        netto = self.jumlah_netto()
+        if netto <= 0:
+            self.status = self.LUNAS
+        elif terbayar <= 0:
             self.status = self.BELUM
-        elif terbayar >= self.jumlah:
+        elif terbayar >= netto:
             self.status = self.LUNAS
         else:
             self.status = self.SEBAGIAN

@@ -11,7 +11,10 @@
   </style>
 </head>
 <body>
-  <p class="no-print"><button onclick="window.print()">Cetak / unduh PDF</button></p>
+  <p class="no-print">
+    <button onclick="window.print()">Cetak</button>
+    <a href="?format=pdf{% if request.GET.periode %}&periode={{ request.GET.periode }}{% endif %}">Unduh PDF</a>
+  </p>
   <h1>Rapor santri</h1>
   <p>{{ pengaturan.nama_tampil }}</p>
   <p><strong>{{ santri.nama }}</strong> · {{ santri.nomor_induk_santri }}</p>

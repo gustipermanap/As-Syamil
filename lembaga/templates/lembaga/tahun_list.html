@@ -10,9 +10,11 @@
 {% for t in daftar %}
   <div class="card mb-2 p-3">
     <strong>{{ t.nama }}</strong> {{ t.aktif|yesno:"(aktif)," }}
+    <a class="small" href="{% url 'lembaga:tahun_ubah' t.pk %}">ubah</a>
     <ul class="mb-0">
       {% for p in t.periode.all %}
-        <li>{{ p.nama }} {{ p.mulai }} – {{ p.selesai }} {{ p.aktif|yesno:"(aktif)," }}</li>
+        <li>{{ p.nama }} {{ p.mulai }} – {{ p.selesai }} {{ p.aktif|yesno:"(aktif)," }}
+          <a href="{% url 'lembaga:periode_ubah' p.pk %}">ubah</a></li>
       {% empty %}<li>Belum ada periode.</li>{% endfor %}
     </ul>
   </div>

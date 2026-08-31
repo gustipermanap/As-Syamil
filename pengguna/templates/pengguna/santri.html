@@ -4,9 +4,27 @@
 <h1 class="h3">Portal santri</h1>
 {% if santri %}
   <p>{{ santri.nama }} · {{ santri.nomor_induk_santri }} · {{ santri.get_status_display }}</p>
+  <p class="small text-muted">Data santri dipakai untuk pendidikan di pesantren dan tidak dipublikasikan. <a href="{% url 'pengguna:privasi' %}">Kebijakan privasi</a>.</p>
   {% if progress %}
     <p>Hafalan: {{ progress.juz_selesai }} juz selesai, halaman {{ progress.halaman_berjalan }}.</p>
   {% endif %}
+  <p>
+    <a class="btn btn-success btn-sm" href="{% url 'pengguna:rapor' santri.pk %}">Rapor</a>
+    <a class="btn btn-outline-success btn-sm" href="{% url 'pengguna:rapor' santri.pk %}?format=pdf">Unduh rapor PDF</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'kesiswaan:izin_santri' %}">Ajukan izin</a>
+  </p>
+  <h2 class="h5">Nilai</h2>
+  <ul>
+    {% for n in nilai %}
+      <li>{{ n.mapel }} — {{ n.nilai }} ({{ n.predikat }}) · {{ n.periode }}</li>
+    {% empty %}<li>Belum ada nilai.</li>{% endfor %}
+  </ul>
+  <h2 class="h5">Tagihan</h2>
+  <ul>
+    {% for t in tagihan %}
+      <li>{{ t.jenis }} — {{ t.get_status_display }} (sisa {{ t.sisa }})</li>
+    {% empty %}<li>Tidak ada tagihan.</li>{% endfor %}
+  </ul>
   <h2 class="h5">Setoran</h2>
   <ul>
     {% for s in setoran %}
@@ -14,7 +32,6 @@
     {% empty %}<li>Belum ada setoran.</li>{% endfor %}
   </ul>
   <h2 class="h5">Izin</h2>
-  <p><a class="btn btn-success btn-sm" href="{% url 'kesiswaan:izin_santri' %}">Ajukan izin</a></p>
   <ul>
     {% for i in izin %}
       <li>{{ i.get_jenis_display }} — {{ i.get_status_display }}</li>

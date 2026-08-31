@@ -18,6 +18,8 @@ from ppdb.models import GelombangPPDB
 from tahfidz.models import ProgressHafalan, SetoranHafalan
 from WebApp.models import Pendaftaran
 from pengguna.daftar import DaftarFilterMixin
+from pengguna.notifikasi import catat_akses
+from pengguna.rapor_pdf import buat_pdf_rapor
 from .forms_util import kelas_bootstrap
 from .mixins import OperasiMixin, SantriPortalMixin, WaliMixin, butuh_operasi
 from .models import GRUP_SANTRI, GRUP_TU, GRUP_WALI
@@ -64,6 +66,10 @@ class OperasiDasbor(OperasiMixin, TemplateView):
         ctx['alpa'] = Absensi.objects.filter(status='alpa').count()
         ctx['hadir_hari_ini'] = Absensi.objects.filter(pertemuan__tanggal=hari, status='hadir').count()
         ctx['hadir_asrama_hari_ini'] = AbsensiAsrama.objects.filter(tanggal=hari, status='hadir').count()
+        ctx['izin_diajukan'] = Izin.objects.filter(status='diajukan').count()
+        ctx['tagihan_jatuh_tempo'] = Tagihan.objects.filter(
+            jatuh_tempo__lt=hari,
+        ).exclude(status__in=['lunas', 'batal']).count()
         pegawai = getattr(self.request.user, 'pegawai', None)
         if pegawai:
             ctx['jadwal_hari_ini'] = JadwalSlot.objects.filter(
@@ -107,9 +113,9 @@ class SantriDasbor(SantriPortalMixin, TemplateView):
         if santri:
             ctx['setoran'] = SetoranHafalan.objects.filter(santri=santri)[:10]
             ctx['progress'] = ProgressHafalan.objects.filter(santri=santri).first()
-            ctx['izin'] = __import__('kesiswaan.models', fromlist=['Izin']).Izin.objects.filter(
-                santri=santri,
-            ).order_by('-mulai')[:10]
+            ctx['izin'] = Izin.objects.filter(santri=santri).order_by('-mulai')[:10]
+            ctx['nilai'] = Penilaian.objects.filter(santri=santri).select_related('mapel', 'periode').order_by('-id')[:20]
+            ctx['tagihan'] = Tagihan.objects.filter(santri=santri).exclude(status='batal')
         return ctx
 
 
@@ -120,16 +126,23 @@ def rapor_html(request, santri_id):
     boleh = request.user.is_superuser or user_punya_grup(request.user, ['tata_usaha', 'mudir'])
     if wali and santri.wali_id == wali.id:
         boleh = True
+    akun = santri_portal(request.user)
+    if akun and akun.pk == santri.pk:
+        boleh = True
     if not boleh:
         return HttpResponseForbidden('Tidak berhak melihat rapor santri ini.')
-    nilai = Penilaian.objects.filter(santri=santri)
+    nilai = Penilaian.objects.filter(santri=santri).select_related('mapel', 'periode')
     periode_id = request.GET.get('periode')
     if periode_id:
         nilai = nilai.filter(periode_id=periode_id)
+    catat_akses(request.user, 'lihat_rapor', objek=santri.nomor_induk_santri, ringkas='rapor')
+    pengaturan = Pengaturan.get()
+    if request.GET.get('format') == 'pdf':
+        return buat_pdf_rapor(santri, list(nilai), pengaturan)
     return render(request, 'pengguna/rapor.html', {
         'santri': santri,
         'nilai': nilai,
-        'pengaturan': Pengaturan.get(),
+        'pengaturan': pengaturan,
     })
 
 
@@ -194,3 +207,18 @@ def reset_sandi(request, pk):
                      '<input class="form-control" type="password" name="sandi" required minlength="6"></div>',
         'submit_label': 'Simpan sandi',
     })
+
+
+@login_required(login_url='/masuk/')
+def daftar_notifikasi(request):
+    from .models import Notifikasi
+    qs = Notifikasi.objects.filter(penerima=request.user)
+    if request.method == 'POST':
+        qs.filter(dibaca=False).update(dibaca=True)
+        messages.success(request, 'Semua notifikasi ditandai sudah dibaca.')
+        return redirect('pengguna:notifikasi')
+    return render(request, 'pengguna/notifikasi.html', {'daftar': qs[:80]})
+
+
+def privasi(request):
+    return render(request, 'pengguna/privasi.html', {'pengaturan': Pengaturan.get()})

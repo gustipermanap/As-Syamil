@@ -4,8 +4,11 @@
 <h1 class="h3">{{ santri.nama }}</h1>
 <p>{{ santri.nomor_induk_santri }} · {{ santri.get_status_display }} · {{ santri.get_jenis_kelamin_display }}</p>
 <p><a class="btn btn-sm btn-outline-success" href="{% url 'kesiswaan:santri_ubah' santri.pk %}">Ubah</a>
-   <a class="btn btn-sm btn-outline-secondary" href="{% url 'pengguna:rapor' santri.pk %}">Rapor</a></p>
-<p>Wali: {{ santri.wali|default:"—" }} · Kamar aktif: {{ kamar.kamar|default:"—" }}</p>
+   <a class="btn btn-sm btn-outline-secondary" href="{% url 'pengguna:rapor' santri.pk %}">Rapor</a>
+   <a class="btn btn-sm btn-outline-secondary" href="{% url 'pengguna:rapor' santri.pk %}?format=pdf">PDF</a></p>
+<p>Wali: {{ santri.wali|default:"—" }}
+  {% if santri.wali %}<a class="small" href="{% url 'kesiswaan:wali_ubah' santri.wali.pk %}">ubah wali</a>{% endif %}
+  · Kamar aktif: {{ kamar.kamar|default:"—" }}</p>
 <p class="small">NIK (internal): {{ santri.nik }}</p>
 <h2 class="h5">Riwayat kamar</h2>
 <ul>

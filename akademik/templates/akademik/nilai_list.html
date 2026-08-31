@@ -5,7 +5,7 @@
 {% include "pengguna/_daftar_toolbar.html" %}
 <p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'akademik:nilai_baru' %}">Input nilai</a></p>
 <table class="table table-sm">
-  <thead><tr><th>Santri</th><th>Mapel</th><th>Nilai</th><th>Predikat</th><th>Jenis</th><th>Periode</th></tr></thead>
+  <thead><tr><th>Santri</th><th>Mapel</th><th>Nilai</th><th>Predikat</th><th>Jenis</th><th>Periode</th><th></th></tr></thead>
   <tbody>
   {% for n in daftar %}
     <tr>
@@ -15,8 +15,9 @@
       <td>{{ n.predikat }}</td>
       <td>{{ n.get_jenis_display }}</td>
       <td>{{ n.periode }}</td>
+      <td><a href="{% url 'akademik:nilai_ubah' n.pk %}">Ubah</a></td>
     </tr>
-  {% empty %}<tr><td colspan="6">Tidak ada nilai sesuai filter.</td></tr>{% endfor %}
+  {% empty %}<tr><td colspan="7">Tidak ada nilai sesuai filter.</td></tr>{% endfor %}
   </tbody>
 </table>
 {% include "pengguna/_pagination.html" %}

@@ -2,8 +2,10 @@
 {% block title %}Portal wali santri{% endblock %}
 {% block isi %}
 <h1 class="h3 mb-3">Portal wali santri</h1>
-<p class="small text-muted">Data anak dipakai untuk pendidikan di pesantren dan tidak dipublikasikan.</p>
-<p><a class="btn btn-success btn-sm" href="{% url 'kesiswaan:izin_wali' %}">Ajukan izin</a></p>
+<p class="small text-muted">Data anak dipakai untuk pendidikan di pesantren dan tidak dipublikasikan. <a href="{% url 'pengguna:privasi' %}">Kebijakan privasi</a>.</p>
+<p>
+  <a class="btn btn-success btn-sm" href="{% url 'kesiswaan:izin_wali' %}">Ajukan izin</a>
+</p>
 {% for item in ringkas %}
   <div class="card mb-3 p-3">
     <h2 class="h5">{{ item.santri.nama }} <small class="text-muted">{{ item.santri.nomor_induk_santri }}</small></h2>
@@ -12,7 +14,8 @@
     <p>RB:
       {% for k in item.rb %}{{ k.rb }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
     </p>
-    <p><a href="{% url 'pengguna:rapor' item.santri.pk %}">Lihat rapor</a></p>
+    <p><a href="{% url 'pengguna:rapor' item.santri.pk %}">Lihat rapor</a> ·
+       <a href="{% url 'pengguna:rapor' item.santri.pk %}?format=pdf">PDF</a></p>
     <h3 class="h6">Absensi ringkas</h3>
     <ul>
       {% for a in item.absensi %}

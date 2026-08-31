@@ -11,10 +11,16 @@
 </p>
 <h2 class="h5">Kamar</h2>
 <table class="table table-sm">
-  <thead><tr><th>Gedung</th><th>Kamar</th><th>Kapasitas</th><th>Terisi</th></tr></thead>
+  <thead><tr><th>Gedung</th><th>Kamar</th><th>Kapasitas</th><th>Terisi</th><th></th></tr></thead>
   <tbody>
   {% for k in kamar %}
-    <tr><td>{{ k.gedung }}</td><td>{{ k.nama }}</td><td>{{ k.kapasitas }}</td><td>{{ k.terisi }}</td></tr>
+    <tr>
+      <td>{{ k.gedung }} <a class="small" href="{% url 'kesiswaan:gedung_ubah' k.gedung_id %}">ubah</a></td>
+      <td>{{ k.nama }}</td>
+      <td>{{ k.kapasitas }}</td>
+      <td>{{ k.terisi }}</td>
+      <td><a href="{% url 'kesiswaan:kamar_ubah' k.pk %}">Ubah kamar</a></td>
+    </tr>
   {% empty %}<tr><td colspan="4">Belum ada kamar.</td></tr>{% endfor %}
   </tbody>
 </table>

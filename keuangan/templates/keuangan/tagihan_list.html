@@ -14,7 +14,7 @@
     <thead>
       <tr>
         <th><input type="checkbox" id="pilih-semua"></th>
-        <th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Sisa</th><th>Jatuh tempo</th><th>Status</th><th></th>
+        <th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Potongan</th><th>Sisa</th><th>Jatuh tempo</th><th>Status</th><th></th>
       </tr>
     </thead>
     <tbody>
@@ -24,12 +24,18 @@
         <td>{{ t.santri }}</td>
         <td>{{ t.jenis }}</td>
         <td>{{ t.jumlah }}</td>
+        <td>{{ t.potongan }}</td>
         <td>{{ t.sisa }}</td>
         <td>{{ t.jatuh_tempo }}</td>
         <td>{{ t.get_status_display }}</td>
-        <td>{% if t.status != 'lunas' and t.status != 'batal' %}<a href="{% url 'keuangan:bayar' t.pk %}">Terima bayar</a>{% endif %}</td>
+        <td>
+          {% if t.status != 'lunas' and t.status != 'batal' %}
+            <a href="{% url 'keuangan:bayar' t.pk %}">Terima bayar</a> ·
+            <a href="{% url 'keuangan:tagihan_potongan' t.pk %}">Potongan</a>
+          {% endif %}
+        </td>
       </tr>
-    {% empty %}<tr><td colspan="8">Tidak ada tagihan sesuai filter.</td></tr>{% endfor %}
+    {% empty %}<tr><td colspan="9">Tidak ada tagihan sesuai filter.</td></tr>{% endfor %}
     </tbody>
   </table>
 </form>

@@ -17,11 +17,12 @@
         <input class="form-check-input" type="checkbox" name="pilih" value="{{ u.pk }}" id="u{{ u.pk }}">
         <label class="form-check-label" for="u{{ u.pk }}">
           <strong>{{ u.nama }}</strong> · {{ u.get_tipe_display }} · {{ u.aktif|yesno:"Aktif,Nonaktif" }}
+          · <a href="{% url 'lembaga:unit_ubah' u.pk %}">Ubah</a>
         </label>
       </div>
       <ul class="mb-0">
         {% for j in u.jenjang.all %}
-          <li>{{ j.nama }} (urutan {{ j.urutan }})</li>
+          <li>{{ j.nama }} (urutan {{ j.urutan }}) <a href="{% url 'lembaga:jenjang_ubah' j.pk %}">ubah</a></li>
         {% empty %}<li class="text-muted">Belum ada jenjang.</li>{% endfor %}
       </ul>
     </div>

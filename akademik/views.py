@@ -4,11 +4,13 @@ from django import forms
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from kesiswaan.models import Pegawai, Santri
 from lembaga.models import Pengaturan, TahunAjaran
+from pengguna.crud import UbahUmumMixin
 from pengguna.daftar import DaftarFilterMixin
+from pengguna.notifikasi import kirim_notifikasi
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin, butuh_operasi
 from pengguna.models import GRUP_TU, GRUP_USTADZ
@@ -139,6 +141,13 @@ class TambahRuang(OperasiMixin, CreateView):
         return ctx
 
 
+class UbahRuang(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = RuangBelajar
+    form_class = RuangForm
+    success_url = reverse_lazy('akademik:rb')
+    judul = 'Ubah ruang belajar'
+
+
 class TambahRB(OperasiMixin, CreateView):
     form_class = RBForm
     template_name = 'pengguna/form_umum.html'
@@ -151,6 +160,16 @@ class TambahRB(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Rombongan belajar'
         return ctx
+
+
+class UbahRB(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = RombonganBelajar
+    form_class = RBForm
+    success_url = reverse_lazy('akademik:rb')
+    judul = 'Ubah rombongan belajar'
+
+    def get_success_url(self):
+        return reverse_lazy('akademik:rb_detail', args=[self.object.pk])
 
 
 @butuh_operasi
@@ -244,6 +263,13 @@ class TambahMapel(OperasiMixin, CreateView):
         return ctx
 
 
+class UbahMapel(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = KitabAtauMapel
+    form_class = MapelForm
+    success_url = reverse_lazy('akademik:mapel')
+    judul = 'Ubah kitab / mapel'
+
+
 @butuh_operasi
 def pasang_mapel(request, pk):
     rb = get_object_or_404(RombonganBelajar, pk=pk)
@@ -318,6 +344,13 @@ class TambahJadwal(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Slot jadwal'
         return ctx
+
+
+class UbahJadwal(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = JadwalSlot
+    form_class = JadwalForm
+    success_url = reverse_lazy('akademik:jadwal')
+    judul = 'Ubah slot jadwal'
 
 
 class DaftarPertemuan(DaftarFilterMixin, OperasiMixin, ListView):
@@ -396,6 +429,18 @@ def isi_absensi(request, pk):
                 pertemuan=pertemuan, santri=a.santri, defaults={'status': status},
             )
         messages.success(request, 'Absensi disimpan.')
+        ambang = Pengaturan.get().ambang_alpa
+        for a in anggota:
+            if request.POST.get(f'status_{a.santri_id}', 'hadir') == 'alpa':
+                if streak_alpa(a.santri) >= ambang:
+                    wali = a.santri.wali
+                    if wali and wali.user_id:
+                        kirim_notifikasi(
+                            wali.user,
+                            'Peringatan alpa beruntun',
+                            f'{a.santri.nama} alpa {ambang} pertemuan atau lebih berturut-turut.',
+                            tautan='/wali/',
+                        )
         return redirect('akademik:absensi')
     tersimpan = {x.santri_id: x.status for x in pertemuan.absensi.all()}
     baris = [
@@ -547,3 +592,10 @@ class TambahNilai(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Input nilai'
         return ctx
+
+
+class UbahNilai(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = Penilaian
+    form_class = NilaiForm
+    success_url = reverse_lazy('akademik:nilai')
+    judul = 'Ubah nilai'

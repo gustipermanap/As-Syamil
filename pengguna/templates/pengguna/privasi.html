@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Kebijakan privasi{% endblock %}
+{% block content %}
+<br><br><br>
+<section class="section">
+  <div class="container" style="max-width:720px;">
+    <h2>Kebijakan privasi data</h2>
+    <p>{{ pengaturan.nama_tampil }} memakai data calon, santri, dan wali hanya untuk penerimaan, pendidikan, pengasuhan, dan administrasi keuangan pesantren.</p>
+    <ul>
+      <li>NIK, NISN, penghasilan, dan foto tidak ditampilkan di halaman publik.</li>
+      <li>Wali hanya melihat data anaknya.</li>
+      <li>Akses rapor dan kwitansi dicatat untuk audit internal.</li>
+      <li>Data tidak dijual atau dipublikasikan ke pihak ketiga tanpa dasar yang sah.</li>
+    </ul>
+    <p><a href="{% url 'ppdb:cek_status' %}">Cek status PPDB</a> · <a href="{% url 'pendaftaran' %}">Formulir PPDB</a></p>
+  </div>
+</section>
+{% endblock %}

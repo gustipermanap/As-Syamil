@@ -3,12 +3,14 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, UpdateView
 
 from akademik.models import RombonganBelajar
+from pengguna.crud import UbahUmumMixin
 from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import KeuanganMixin, butuh_keuangan
+from pengguna.notifikasi import catat_akses
 from .models import JenisTagihan, Pembayaran, Tagihan
 from .services import generate_tagihan_massal, terima_bayar
 
@@ -33,6 +35,7 @@ class DaftarTagihan(DaftarFilterMixin, KeuanganMixin, ListView):
         ('NIS', 'santri.nomor_induk_santri'),
         ('Jenis', 'jenis.nama'),
         ('Jumlah', 'jumlah'),
+        ('Potongan', 'potongan'),
         ('Sisa', 'sisa'),
         ('Status', 'get_status_display'),
         ('Jatuh tempo', 'jatuh_tempo'),
@@ -84,6 +87,36 @@ class TambahJenis(KeuanganMixin, CreateView):
         return ctx
 
 
+class UbahJenis(UbahUmumMixin, KeuanganMixin, UpdateView):
+    model = JenisTagihan
+    form_class = JenisForm
+    success_url = reverse_lazy('keuangan:tagihan')
+    judul = 'Ubah jenis tagihan'
+
+
+class TagihanPotonganForm(forms.ModelForm):
+    class Meta:
+        model = Tagihan
+        fields = ['potongan']
+
+
+class UbahTagihan(UbahUmumMixin, KeuanganMixin, UpdateView):
+    model = Tagihan
+    form_class = TagihanPotonganForm
+    success_url = reverse_lazy('keuangan:tagihan')
+    judul = 'Potongan / beasiswa'
+
+    def form_valid(self, form):
+        try:
+            form.instance.full_clean()
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        resp = super().form_valid(form)
+        self.object.refresh_status()
+        return resp
+
+
 @butuh_keuangan
 def generate(request):
     from lembaga.models import Periode
@@ -126,4 +159,5 @@ def bayar(request, pk):
 @butuh_keuangan
 def kwitansi(request, pk):
     bayaran = get_object_or_404(Pembayaran, pk=pk)
+    catat_akses(request.user, 'lihat_kwitansi', objek=bayaran.nomor_kwitansi, ringkas='kwitansi')
     return render(request, 'keuangan/kwitansi.html', {'bayaran': bayaran})

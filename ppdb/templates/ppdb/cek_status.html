@@ -5,13 +5,19 @@
 <section class="section">
   <div class="container" style="max-width:520px;">
     <h2>Cek status pendaftaran</h2>
-    <p class="small text-muted">Data dipakai untuk penerimaan dan pendidikan, tidak dipublikasikan.</p>
-    <form method="post">{% csrf_token %}
+    <p class="small text-muted">Data dipakai untuk penerimaan dan pendidikan, tidak dipublikasikan. <a href="{% url 'pengguna:privasi' %}">Kebijakan privasi</a>.</p>
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
       <label>Kode pendaftaran</label>
-      <input class="form-control mb-2" name="kode" required>
+      <input class="form-control mb-2" name="kode" required value="{{ request.POST.kode }}">
       <label>Tanggal lahir</label>
-      <input class="form-control mb-3" type="date" name="tanggal_lahir">
+      <input class="form-control mb-3" type="date" name="tanggal_lahir" value="{{ request.POST.tanggal_lahir }}">
       <button class="btn btn-primary" type="submit">Cek</button>
+      {% if hasil and hasil.status == 'berkas_kurang' %}
+        <hr>
+        <p>Berkas kurang. Unggah ulang foto/berkas, lalu kirim lagi.</p>
+        <input class="form-control mb-2" type="file" name="foto" accept="image/*">
+        <button class="btn btn-success" type="submit">Unggah ulang berkas</button>
+      {% endif %}
     </form>
     {% if hasil %}
       <div class="alert alert-success mt-3">

@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -13,7 +12,8 @@ from .models import (
     AbsensiAsrama, CatatanPelanggaran, Gedung, Izin, JenisPelanggaran, Kamar,
     Pegawai, PenempatanKamar, Santri, WaliSantri,
 )
-from .services import anak_wali, pindah_kamar, proses_izin, santri_portal
+from pengguna.notifikasi import catat_akses
+from .services import anak_wali, pindah_kamar, proses_izin, santri_portal, tautkan_akun_pegawai, tautkan_akun_santri, tautkan_akun_wali
 
 
 class PegawaiForm(forms.ModelForm):
@@ -31,8 +31,23 @@ class PegawaiForm(forms.ModelForm):
         model = Pegawai
         fields = ['nama', 'jenis_kelamin', 'kontak', 'aktif']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.user_id:
+            self.fields['username'].initial = self.instance.user.username
+            self.fields['username'].help_text = 'Sudah tertaut. Isi sandi hanya jika ingin mengganti.'
+            grup = self.instance.user.groups.first()
+            if grup:
+                self.fields['grup'].initial = grup.name
+
 
 class SantriForm(forms.ModelForm):
+    username = forms.CharField(
+        required=False,
+        help_text='Untuk portal santri. Kosongkan jika belum perlu akun.',
+    )
+    sandi = forms.CharField(required=False, widget=forms.PasswordInput)
+
     class Meta:
         model = Santri
         fields = [
@@ -41,11 +56,26 @@ class SantriForm(forms.ModelForm):
         ]
         widgets = {'tanggal_lahir': forms.DateInput(attrs={'type': 'date'})}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.user_id:
+            self.fields['username'].initial = self.instance.user.username
+            self.fields['username'].help_text = 'Sudah tertaut. Isi sandi hanya jika ingin mengganti.'
+
 
 class WaliForm(forms.ModelForm):
+    username = forms.CharField(required=False, help_text='Untuk portal wali. Kosongkan jika belum perlu akun.')
+    sandi = forms.CharField(required=False, widget=forms.PasswordInput)
+
     class Meta:
         model = WaliSantri
         fields = ['nama', 'hubungan', 'kontak', 'alamat', 'pekerjaan']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.user_id:
+            self.fields['username'].initial = self.instance.user.username
+            self.fields['username'].help_text = 'Sudah tertaut. Isi sandi hanya jika ingin mengganti.'
 
 
 class GedungForm(forms.ModelForm):
@@ -154,6 +184,7 @@ class DetailSantri(OperasiMixin, DetailView):
         ctx['kamar'] = self.object.penempatan_kamar.filter(keluar__isnull=True).select_related('kamar__gedung').first()
         ctx['riwayat_kamar'] = self.object.penempatan_kamar.select_related('kamar__gedung').order_by('-masuk')
         ctx['rb'] = self.object.keanggotaan_rb.select_related('rb')
+        catat_akses(self.request.user, 'lihat_santri', objek=self.object.nomor_induk_santri, ringkas='profil')
         return ctx
 
 
@@ -172,7 +203,22 @@ class UbahSantri(OperasiMixin, UpdateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = f'Ubah {self.object.nama}'
         ctx['enctype'] = 'multipart/form-data'
+        ctx['deskripsi'] = 'Tautkan akun portal santri di sini jika belum punya login.'
         return ctx
+
+    def form_valid(self, form):
+        santri = form.save()
+        try:
+            tautkan_akun_santri(
+                santri,
+                form.cleaned_data.get('username'),
+                form.cleaned_data.get('sandi'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        messages.success(self.request, 'Santri disimpan.')
+        return redirect(self.get_success_url())
 
 
 class TambahSantri(OperasiMixin, CreateView):
@@ -189,6 +235,20 @@ class TambahSantri(OperasiMixin, CreateView):
         ctx['judul'] = 'Santri baru'
         ctx['enctype'] = 'multipart/form-data'
         return ctx
+
+    def form_valid(self, form):
+        santri = form.save()
+        try:
+            tautkan_akun_santri(
+                santri,
+                form.cleaned_data.get('username'),
+                form.cleaned_data.get('sandi'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        messages.success(self.request, 'Santri disimpan.')
+        return redirect(self.success_url)
 
 
 class DaftarPegawai(DaftarFilterMixin, OperasiMixin, ListView):
@@ -251,16 +311,47 @@ class TambahPegawai(OperasiMixin, CreateView):
 
     def form_valid(self, form):
         pegawai = form.save()
-        username = form.cleaned_data.get('username')
-        sandi = form.cleaned_data.get('sandi')
-        grup = form.cleaned_data.get('grup')
-        if username and sandi:
-            user = User.objects.create_user(username=username, password=sandi)
-            pegawai.user = user
-            pegawai.save()
-            if grup:
-                g, _ = Group.objects.get_or_create(name=grup)
-                user.groups.add(g)
+        try:
+            tautkan_akun_pegawai(
+                pegawai,
+                form.cleaned_data.get('username'),
+                form.cleaned_data.get('sandi'),
+                form.cleaned_data.get('grup'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        messages.success(self.request, 'Pegawai disimpan.')
+        return redirect(self.success_url)
+
+
+class UbahPegawai(OperasiMixin, UpdateView):
+    model = Pegawai
+    form_class = PegawaiForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('kesiswaan:pegawai')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = f'Ubah {self.object.nama}'
+        ctx['deskripsi'] = 'Tautkan atau ganti akun staf di sini jika pegawai belum punya login.'
+        return ctx
+
+    def form_valid(self, form):
+        pegawai = form.save()
+        try:
+            tautkan_akun_pegawai(
+                pegawai,
+                form.cleaned_data.get('username'),
+                form.cleaned_data.get('sandi'),
+                form.cleaned_data.get('grup'),
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
         messages.success(self.request, 'Pegawai disimpan.')
         return redirect(self.success_url)
 
@@ -286,6 +377,41 @@ class TambahWali(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Wali santri baru'
         return ctx
+
+    def form_valid(self, form):
+        wali = form.save()
+        try:
+            tautkan_akun_wali(wali, form.cleaned_data.get('username'), form.cleaned_data.get('sandi'))
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        messages.success(self.request, 'Wali disimpan.')
+        return redirect(self.success_url)
+
+
+class UbahWali(OperasiMixin, UpdateView):
+    model = WaliSantri
+    form_class = WaliForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('kesiswaan:santri')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = f'Ubah wali {self.object.nama}'
+        return ctx
+
+    def form_valid(self, form):
+        wali = form.save()
+        try:
+            tautkan_akun_wali(wali, form.cleaned_data.get('username'), form.cleaned_data.get('sandi'))
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        messages.success(self.request, 'Wali disimpan.')
+        return redirect(self.success_url)
 
 
 class AsramaDasbor(OperasiMixin, ListView):
@@ -316,6 +442,21 @@ class TambahGedung(OperasiMixin, CreateView):
         return ctx
 
 
+class UbahGedung(OperasiMixin, UpdateView):
+    model = Gedung
+    form_class = GedungForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('kesiswaan:asrama')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = f'Ubah gedung {self.object.nama}'
+        return ctx
+
+
 class TambahKamar(OperasiMixin, CreateView):
     form_class = KamarForm
     template_name = 'pengguna/form_umum.html'
@@ -327,6 +468,21 @@ class TambahKamar(OperasiMixin, CreateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Kamar baru'
+        return ctx
+
+
+class UbahKamar(OperasiMixin, UpdateView):
+    model = Kamar
+    form_class = KamarForm
+    template_name = 'pengguna/form_umum.html'
+    success_url = reverse_lazy('kesiswaan:asrama')
+
+    def get_form(self, form_class=None):
+        return kelas_bootstrap(super().get_form(form_class))
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul'] = f'Ubah kamar {self.object}'
         return ctx
 
 

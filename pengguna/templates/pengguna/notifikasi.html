@@ -1,0 +1,20 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Notifikasi{% endblock %}
+{% block isi %}
+<h1 class="h3 mb-3">Notifikasi</h1>
+<form method="post" class="mb-3">{% csrf_token %}
+  <button class="btn btn-sm btn-outline-success" type="submit">Tandai semua sudah dibaca</button>
+</form>
+<ul class="list-group">
+  {% for n in daftar %}
+    <li class="list-group-item{% if not n.dibaca %} list-group-item-warning{% endif %}">
+      <strong>{{ n.judul }}</strong>
+      <div class="small text-muted">{{ n.dibuat }}</div>
+      {% if n.isi %}<p class="mb-1">{{ n.isi }}</p>{% endif %}
+      {% if n.tautan %}<a href="{{ n.tautan }}">Buka</a>{% endif %}
+    </li>
+  {% empty %}
+    <li class="list-group-item">Belum ada notifikasi.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

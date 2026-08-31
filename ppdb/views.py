@@ -227,6 +227,7 @@ def status_gelombang(request, pk, status):
 
 def cek_status(request):
     hasil = None
+    pesan_berkas = ''
     if request.method == 'POST':
         kode = request.POST.get('kode', '').strip()
         tgl = request.POST.get('tanggal_lahir', '')
@@ -234,4 +235,10 @@ def cek_status(request):
         if tgl:
             qs = qs.filter(tanggal_lahir=tgl)
         hasil = qs.first()
-    return render(request, 'ppdb/cek_status.html', {'hasil': hasil})
+        if hasil and hasil.status == 'berkas_kurang' and request.FILES.get('foto'):
+            hasil.foto = request.FILES['foto']
+            hasil.status = 'dikirim'
+            hasil.save()
+            pesan_berkas = 'Berkas diunggah ulang. Status kembali ke dikirim untuk dicek Tata Usaha.'
+            messages.success(request, pesan_berkas)
+    return render(request, 'ppdb/cek_status.html', {'hasil': hasil, 'pesan_berkas': pesan_berkas})

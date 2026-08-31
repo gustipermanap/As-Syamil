@@ -35,3 +35,41 @@ class Profil(models.Model):
 
     def nama_grup(self):
         return list(self.user.groups.values_list('name', flat=True))
+
+
+class Notifikasi(models.Model):
+    penerima = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifikasi',
+    )
+    judul = models.CharField(max_length=160)
+    isi = models.TextField(blank=True)
+    tautan = models.CharField(max_length=200, blank=True)
+    dibaca = models.BooleanField(default=False)
+    dibuat = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Notifikasi'
+        verbose_name_plural = 'Notifikasi'
+        ordering = ['-dibuat']
+
+    def __str__(self):
+        return self.judul
+
+
+class LogAkses(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='log_akses',
+    )
+    aksi = models.CharField(max_length=80)
+    objek = models.CharField(max_length=120, blank=True)
+    ringkas = models.CharField(max_length=200, blank=True)
+    dibuat = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Log akses'
+        verbose_name_plural = 'Log akses'
+        ordering = ['-dibuat']
+
+    def __str__(self):
+        return f'{self.aksi} {self.objek}'

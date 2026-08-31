@@ -47,4 +47,13 @@ def portal_menu(request):
     return {
         'pengaturan': p,
         'menu': menu_flags(request.user),
+        'notif_belum': _hitung_notif(request.user),
     }
+
+
+def _hitung_notif(user):
+    try:
+        from .models import Notifikasi
+        return Notifikasi.objects.filter(penerima=user, dibaca=False).count()
+    except (OperationalError, ProgrammingError, Exception):
+        return 0

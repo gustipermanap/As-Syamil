@@ -11,6 +11,8 @@ urlpatterns = [
     path('wali/', views.WaliDasbor.as_view(), name='wali'),
     path('santri/', views.SantriDasbor.as_view(), name='santri'),
     path('rapor/<int:santri_id>/', views.rapor_html, name='rapor'),
+    path('notifikasi/', views.daftar_notifikasi, name='notifikasi'),
+    path('privasi/', views.privasi, name='privasi'),
     path('operasi/pengguna/', views.DaftarPengguna.as_view(), name='daftar'),
     path('operasi/pengguna/<int:pk>/sandi/', views.reset_sandi, name='reset_sandi'),
 ]

@@ -43,6 +43,9 @@
       <div class="d-flex align-items-center">
         {% if user.is_authenticated %}
           <span class="text-white me-3">{{ user.username }}</span>
+          <a class="btn btn-outline-light btn-sm me-2" href="{% url 'pengguna:notifikasi' %}">
+            Notifikasi{% if notif_belum %} <span class="badge bg-warning text-dark">{{ notif_belum }}</span>{% endif %}
+          </a>
           <a class="btn btn-outline-light btn-sm" href="{% url 'pengguna:keluar' %}">Keluar</a>
         {% endif %}
       </div>
@@ -54,6 +57,7 @@
     {% for m in messages %}<div class="alert alert-info">{{ m }}</div>{% endfor %}
   {% endif %}
   {% block isi %}{% endblock %}
+  <p class="small text-muted mt-5"><a href="{% url 'pengguna:privasi' %}">Kebijakan privasi</a></p>
 </div>
 <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 </body>

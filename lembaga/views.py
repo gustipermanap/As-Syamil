@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
+from pengguna.crud import UbahUmumMixin
 from pengguna.daftar import DaftarFilterMixin
 from pengguna.forms_util import kelas_bootstrap
 from pengguna.mixins import OperasiMixin
@@ -136,6 +137,13 @@ class TambahUnit(OperasiMixin, CreateView):
         return ctx
 
 
+class UbahUnit(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = UnitPendidikan
+    form_class = UnitForm
+    success_url = reverse_lazy('lembaga:unit')
+    judul = 'Ubah unit'
+
+
 class TambahJenjang(OperasiMixin, CreateView):
     model = Jenjang
     form_class = JenjangForm
@@ -149,6 +157,13 @@ class TambahJenjang(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Jenjang baru'
         return ctx
+
+
+class UbahJenjang(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = Jenjang
+    form_class = JenjangForm
+    success_url = reverse_lazy('lembaga:unit')
+    judul = 'Ubah jenjang'
 
 
 class DaftarTahunAjaran(DaftarFilterMixin, OperasiMixin, ListView):
@@ -188,6 +203,13 @@ class TambahTahunAjaran(OperasiMixin, CreateView):
         return ctx
 
 
+class UbahTahunAjaran(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = TahunAjaran
+    form_class = TahunAjaranForm
+    success_url = reverse_lazy('lembaga:tahun')
+    judul = 'Ubah tahun ajaran'
+
+
 class TambahPeriode(OperasiMixin, CreateView):
     model = Periode
     form_class = PeriodeForm
@@ -201,3 +223,10 @@ class TambahPeriode(OperasiMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['judul'] = 'Periode'
         return ctx
+
+
+class UbahPeriode(UbahUmumMixin, OperasiMixin, UpdateView):
+    model = Periode
+    form_class = PeriodeForm
+    success_url = reverse_lazy('lembaga:tahun')
+    judul = 'Ubah periode'

@@ -5,10 +5,16 @@
 {% include "pengguna/_daftar_toolbar.html" %}
 <p class="mb-3"><a class="btn btn-success btn-sm" href="{% url 'akademik:mapel_baru' %}">Tambah</a></p>
 <table class="table table-sm">
-  <thead><tr><th>Nama</th><th>Unit</th><th>Jenis</th><th>KKM</th></tr></thead>
+  <thead><tr><th>Nama</th><th>Unit</th><th>Jenis</th><th>KKM</th><th></th></tr></thead>
   <tbody>
   {% for m in daftar %}
-    <tr><td>{{ m.nama }}</td><td>{{ m.unit }}</td><td>{{ m.get_jenis_display }}</td><td>{{ m.kkm|default:"—" }}</td></tr>
+    <tr>
+      <td>{{ m.nama }}</td>
+      <td>{{ m.unit }}</td>
+      <td>{{ m.get_jenis_display }}</td>
+      <td>{{ m.kkm|default:"—" }}</td>
+      <td><a href="{% url 'akademik:mapel_ubah' m.pk %}">Ubah</a></td>
+    </tr>
   {% empty %}<tr><td colspan="4">Tidak ada data sesuai filter.</td></tr>{% endfor %}
   </tbody>
 </table>

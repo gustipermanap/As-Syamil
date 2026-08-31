@@ -6,6 +6,8 @@
   <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_anggota' rb.pk %}">Tambah anggota</a>
   <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_pengampu' rb.pk %}">Pengampu</a>
   <a class="btn btn-sm btn-outline-success" href="{% url 'akademik:rb_mapel' rb.pk %}">Pasang mapel</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{% url 'akademik:rb_ubah' rb.pk %}">Ubah RB</a>
+  <a class="btn btn-sm btn-outline-secondary" href="{% url 'akademik:ruang_ubah' rb.ruang_id %}">Ubah ruang</a>
 </p>
 {% if tahun_lain %}
 <form method="post" action="{% url 'akademik:rb_salin' rb.pk %}" class="card card-body mb-3">
