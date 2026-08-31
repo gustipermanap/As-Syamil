@@ -200,7 +200,7 @@ class Command(BaseCommand):
         )
 
         now = timezone.now()
-        GelombangPPDB.objects.get_or_create(
+        gelombang, _ = GelombangPPDB.objects.get_or_create(
             nama='Gelombang 1 1447 H',
             defaults={
                 'mulai': now - timedelta(days=7),
@@ -210,7 +210,7 @@ class Command(BaseCommand):
                 'unit_tujuan': diniyah,
             },
         )
-        Pendaftaran.objects.get_or_create(
+        pendaftar, _ = Pendaftaran.objects.get_or_create(
             kode_pendaftaran='CONTOH01',
             defaults={
                 'nama_lengkap': 'Calon Contoh',
