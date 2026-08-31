@@ -2,13 +2,16 @@ from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseForbidden
+from django.shortcuts import render
 from django.urls import reverse_lazy
 
 from lembaga.models import Pengaturan
 from .models import GRUP_BENDAHARA, GRUP_MUDIR, GRUP_OPERASI, GRUP_SANTRI, GRUP_TU, GRUP_WALI
 from .services import user_punya_grup
+
+
+def respon_dilarang(request, pesan='Tidak berhak mengakses halaman ini.'):
+    return render(request, 'pengguna/dilarang.html', {'pesan': pesan}, status=403)
 
 
 class OperasiMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -19,7 +22,7 @@ class OperasiMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            raise PermissionDenied('Tidak berhak mengakses portal operasional.')
+            return respon_dilarang(self.request, 'Tidak berhak mengakses portal operasional.')
         return super().handle_no_permission()
 
 
@@ -31,7 +34,7 @@ class WaliMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            raise PermissionDenied('Tidak berhak mengakses portal wali.')
+            return respon_dilarang(self.request, 'Tidak berhak mengakses portal wali.')
         return super().handle_no_permission()
 
 
@@ -45,7 +48,7 @@ class SantriPortalMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            raise PermissionDenied('Portal santri tidak aktif atau Anda tidak berhak.')
+            return respon_dilarang(self.request, 'Portal santri tidak aktif atau Anda tidak berhak.')
         return super().handle_no_permission()
 
 
@@ -60,13 +63,18 @@ class KeuanganMixin(OperasiMixin):
             return user_punya_grup(self.request.user, [GRUP_TU])
         return user_punya_grup(self.request.user, [GRUP_BENDAHARA])
 
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return respon_dilarang(self.request, 'Menu keuangan hanya untuk pengelola yang ditunjuk.')
+        return super().handle_no_permission()
+
 
 def butuh_operasi(view):
     @login_required(login_url='/masuk/')
     @wraps(view)
     def inner(request, *args, **kwargs):
         if not user_punya_grup(request.user, GRUP_OPERASI):
-            return HttpResponseForbidden('Tidak berhak mengakses portal operasional.')
+            return respon_dilarang(request, 'Tidak berhak mengakses portal operasional.')
         return view(request, *args, **kwargs)
     return inner
 
@@ -80,9 +88,9 @@ def butuh_keuangan(view):
         pengaturan = Pengaturan.get()
         if pengaturan.pengelola_keuangan == Pengaturan.PENGELOLA_TU:
             if not user_punya_grup(request.user, [GRUP_TU]):
-                return HttpResponseForbidden('Menu keuangan dipegang Tata Usaha.')
+                return respon_dilarang(request, 'Menu keuangan dipegang Tata Usaha.')
         elif not user_punya_grup(request.user, [GRUP_BENDAHARA]):
-            return HttpResponseForbidden('Menu keuangan dipegang Bendahara.')
+            return respon_dilarang(request, 'Menu keuangan dipegang Bendahara.')
         return view(request, *args, **kwargs)
     return inner
 
@@ -92,6 +100,6 @@ def butuh_wali(view):
     @wraps(view)
     def inner(request, *args, **kwargs):
         if not (user_punya_grup(request.user, [GRUP_WALI]) or request.user.is_superuser):
-            return HttpResponseForbidden('Tidak berhak mengakses portal wali.')
+            return respon_dilarang(request, 'Tidak berhak mengakses portal wali.')
         return view(request, *args, **kwargs)
     return inner

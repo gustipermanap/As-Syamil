@@ -10,7 +10,9 @@
 <body class="bg-light">
 <nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'pengguna:operasi' %}">Operasional Pesantren</a>
+    <a class="navbar-brand" href="{% if menu.operasi %}{% url 'pengguna:operasi' %}{% elif menu.santri %}{% url 'pengguna:santri' %}{% else %}{% url 'pengguna:wali' %}{% endif %}">
+      {% if menu.operasi %}Operasional Pesantren{% elif menu.santri %}Portal santri{% else %}Portal wali santri{% endif %}
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navop">
       <span class="navbar-toggler-icon"></span>
     </button>

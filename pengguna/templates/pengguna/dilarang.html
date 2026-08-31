@@ -1,0 +1,17 @@
+{% extends "pengguna/base_portal.html" %}
+{% block title %}Tidak berhak{% endblock %}
+{% block isi %}
+<h1 class="h3">Tidak berhak</h1>
+<p>{{ pesan }}</p>
+<p>
+  {% if menu.operasi %}
+    <a href="{% url 'pengguna:operasi' %}">Kembali ke dasbor operasional</a>
+  {% elif menu.santri %}
+    <a href="{% url 'pengguna:santri' %}">Kembali ke portal santri</a>
+  {% elif menu.wali %}
+    <a href="{% url 'pengguna:wali' %}">Kembali ke portal wali</a>
+  {% else %}
+    <a href="{% url 'pengguna:masuk' %}">Masuk kembali</a>
+  {% endif %}
+</p>
+{% endblock %}

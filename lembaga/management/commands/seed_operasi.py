@@ -244,8 +244,12 @@ class Command(BaseCommand):
                 'alamat_orangtua': 'Kp. Parasi',
                 'alamat': 'Kp. Parasi',
                 'status': 'dikirim',
+                'gelombang': gelombang,
             },
         )
+        if not pendaftar.gelombang_id:
+            pendaftar.gelombang = gelombang
+            pendaftar.save(update_fields=['gelombang'])
 
         SetoranHafalan.objects.get_or_create(
             santri=santri_objs[0],

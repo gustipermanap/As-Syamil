@@ -1,7 +1,7 @@
 from django.db.utils import OperationalError, ProgrammingError
 
 from lembaga.models import Pengaturan, UnitPendidikan
-from .models import GRUP_BENDAHARA, GRUP_MUDIR, GRUP_OPERASI, GRUP_TU
+from .models import GRUP_BENDAHARA, GRUP_MUDIR, GRUP_OPERASI, GRUP_SANTRI, GRUP_TU, GRUP_WALI
 from .services import user_punya_grup
 
 
@@ -32,6 +32,8 @@ def menu_flags(user=None):
             )
         )
         flags['operasi'] = user_punya_grup(user, GRUP_OPERASI)
+        flags['wali'] = user_punya_grup(user, [GRUP_WALI])
+        flags['santri'] = user_punya_grup(user, [GRUP_SANTRI]) and p.portal_santri_aktif
     return flags
 
 

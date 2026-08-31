@@ -29,6 +29,8 @@ class PortalTests(TestCase):
         self.client.login(username='wali_portal', password='sandi123')
         r = self.client.get(reverse('pengguna:operasi'))
         self.assertEqual(r.status_code, 403)
+        self.assertContains(r, 'Tidak berhak', status_code=403)
+        self.assertContains(r, 'portal wali', status_code=403)
 
     def test_wali_masuk_portal_wali(self):
         self.client.login(username='wali_portal', password='sandi123')
@@ -42,6 +44,7 @@ class PortalTests(TestCase):
         self.assertNotContains(r, reverse('keuangan:tagihan'))
         r2 = self.client.get(reverse('keuangan:tagihan'))
         self.assertEqual(r2.status_code, 403)
+        self.assertContains(r2, 'keuangan', status_code=403)
 
     def test_portal_santri_bendera(self):
         p = Pengaturan.get()
